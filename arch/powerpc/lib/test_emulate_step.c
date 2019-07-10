@@ -65,6 +65,34 @@
 					___PPC_RA(a) | ___PPC_RB(b))
 #define TEST_LVX(t, a, b)	ppc_inst(PPC_INST_LVX | ___PPC_RT(t) |		\
 					___PPC_RA(a) | ___PPC_RB(b))
+#define TEST_PLFS(r, base, i, pr) ppc_inst_prefix((PPC_PREFIX_MLS |		\
+						__PPC_PRFX_R(pr) |	\
+						IMM_H(i)),		\
+						(PPC_INST_LFS |	\
+						___PPC_RT(r) |		\
+						___PPC_RA(base) |	\
+						IMM_L(i)))
+#define TEST_PSTFS(r, base, i, pr) ppc_inst_prefix((PPC_PREFIX_MLS |		\
+						__PPC_PRFX_R(pr) |	\
+						IMM_H(i)),		\
+						(PPC_INST_STFS |	\
+						___PPC_RT(r) |		\
+						___PPC_RA(base) |	\
+						IMM_L(i)))
+#define TEST_PLFD(r, base, i, pr) ppc_inst_prefix((PPC_PREFIX_MLS |		\
+						__PPC_PRFX_R(pr) |	\
+						IMM_H(i)),		\
+						(PPC_INST_LFD |	\
+						___PPC_RT(r) |		\
+						___PPC_RA(base) |	\
+						IMM_L(i)))
+#define TEST_PSTFD(r, base, i, pr) ppc_inst_prefix((PPC_PREFIX_MLS |		\
+						__PPC_PRFX_R(pr) |	\
+						IMM_H(i)),		\
+						(PPC_INST_STFD |	\
+						___PPC_RT(r) |		\
+						___PPC_RA(base) |	\
+						IMM_L(i)))
 #define TEST_STVX(s, a, b)	ppc_inst(PPC_INST_STVX | ___PPC_RS(s) |		\
 					___PPC_RA(a) | ___PPC_RB(b))
 #define TEST_LXVD2X(s, a, b)	ppc_inst(PPC_INST_LXVD2X | VSX_XX1((s), R##a, R##b))
@@ -369,6 +397,59 @@ static void __init test_lfsx_stfsx(void)
 		show_result("stfsx", "FAIL");
 }
 
+static void __init test_plfs_pstfs(void)
+{
+	struct pt_regs regs;
+	struct ppc_inst instr;
+	union {
+		float a;
+		int b;
+	} c;
+	int cached_b;
+	int stepped = -1;
+
+	if (!cpu_has_feature(CPU_FTR_ARCH_31)) {
+		show_result("pld", "SKIP (!CPU_FTR_ARCH_31)");
+		return;
+	}
+
+	instr = TEST_PLFS(10, 3, 0, 0);
+
+	init_pt_regs(&regs);
+
+
+	/*** plfs ***/
+
+	c.a = 123.45;
+	cached_b = c.b;
+
+	regs.gpr[3] = (unsigned long) &c.a;
+	regs.nip = ((unsigned long) &instr);
+
+	/* plfs frt10, 0(r3), 0  */
+	stepped = emulate_step(&regs, instr);
+
+	if (stepped == 1)
+		show_result("plfs", "PASS");
+	else
+		show_result("plfs", "FAIL");
+
+
+	/*** pstfs ***/
+
+	c.a = 678.91;
+
+	/* pstfs frs10, 0(r3), 0 */
+	instr = TEST_PSTFS(10, 3, 0, 0);
+	regs.nip = ((unsigned long) &instr);
+	stepped = emulate_step(&regs, instr);
+
+	if (stepped == 1 && c.b == cached_b)
+		show_result("pstfs", "PASS");
+	else
+		show_result("pstfs", "FAIL");
+}
+
 static void __init test_lfdx_stfdx(void)
 {
 	struct pt_regs regs;
@@ -411,6 +492,59 @@ static void __init test_lfdx_stfdx(void)
 	else
 		show_result("stfdx", "FAIL");
 }
+
+static void __init test_plfd_pstfd(void)
+{
+	struct pt_regs regs;
+	struct ppc_inst instr;
+	union {
+		double a;
+		long b;
+	} c;
+	long cached_b;
+	int stepped = -1;
+
+	if (!cpu_has_feature(CPU_FTR_ARCH_31)) {
+		show_result("pld", "SKIP (!CPU_FTR_ARCH_31)");
+		return;
+	}
+
+	instr = TEST_PLFD(10, 3, 0, 0);
+
+	init_pt_regs(&regs);
+
+
+	/*** plfd ***/
+
+	c.a = 123456.78;
+	cached_b = c.b;
+
+	regs.gpr[3] = (unsigned long) &c.a;
+	regs.nip = ((unsigned long) &instr);
+
+	/* plfd frt10, 0(r3), 0 */
+	stepped = emulate_step(&regs, instr);
+
+	if (stepped == 1)
+		show_result("plfd", "PASS");
+	else
+		show_result("plfd", "FAIL");
+
+
+	/*** pstfd ***/
+
+	c.a = 987654.32;
+
+	/* pstfd frs10, 0(r3), 0 */
+	instr = TEST_PSTFD(10, 3, 0, 0);
+	regs.nip = ((unsigned long) &instr);
+	stepped = emulate_step(&regs, instr);
+
+	if (stepped == 1 && c.b == cached_b)
+		show_result("pstfd", "PASS");
+	else
+		show_result("pstfd", "FAIL");
+}
 #else
 static void __init test_lfsx_stfsx(void)
 {
@@ -418,10 +552,22 @@ static void __init test_lfsx_stfsx(void)
 	show_result("stfsx", "SKIP (CONFIG_PPC_FPU is not set)");
 }
 
+static void __init test_plfs_pstfs(void)
+{
+	show_result("plfs", "SKIP (CONFIG_PPC_FPU is not set)");
+	show_result("pstfs", "SKIP (CONFIG_PPC_FPU is not set)");
+}
+
 static void __init test_lfdx_stfdx(void)
 {
 	show_result("lfdx", "SKIP (CONFIG_PPC_FPU is not set)");
 	show_result("stfdx", "SKIP (CONFIG_PPC_FPU is not set)");
+}
+
+static void __init test_plfd_pstfd(void)
+{
+	show_result("plfd", "SKIP (CONFIG_PPC_FPU is not set)");
+	show_result("pstfd", "SKIP (CONFIG_PPC_FPU is not set)");
 }
 #endif /* CONFIG_PPC_FPU */
 
@@ -559,7 +705,9 @@ static void __init run_tests_load_store(void)
 	test_pstd();
 	test_ldarx_stdcx();
 	test_lfsx_stfsx();
+	test_plfs_pstfs();
 	test_lfdx_stfdx();
+	test_plfd_pstfd();
 	test_lvx_stvx();
 	test_lxvd2x_stxvd2x();
 }
