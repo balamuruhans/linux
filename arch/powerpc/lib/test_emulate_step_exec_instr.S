@@ -82,6 +82,8 @@ _GLOBAL(exec_instr)
 	/* Placeholder for the test instruction */
 1:	nop
 	patch_site 1b patch__exec_instr
+2:	nop
+	patch_site 2b patch__exec_suffix
 
 	/*
 	 * Since GPR3 is overwritten, temporarily restore it back to its
@@ -121,13 +123,13 @@ _GLOBAL(exec_instr)
 	li	r3, 0
 
 	/* Continue */
-	b	3f
+	b	4f
 
 	/* Set return value to denote execution failure */
-2:	li	r3, -EFAULT
+3:	li	r3, -EFAULT
 
 	/* Restore the non-volatile GPRs from stack */
-3:	REST_GPR(2, r1)
+4:	REST_GPR(2, r1)
 	REST_NVGPRS(r1)
 
 	/* Restore LR from stack to be able to return */
@@ -145,6 +147,6 @@ _GLOBAL(exec_instr)
 	blr
 
 	/* Setup exception table */
-	EX_TABLE(1b, 2b)
+	EX_TABLE(1b, 3b)
 
 _ASM_NOKPROBE_SYMBOL(exec_instr)

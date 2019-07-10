@@ -105,6 +105,13 @@
 					___PPC_RA(a) | ___PPC_RB(b))
 #define TEST_ADDC_DOT(t, a, b)	ppc_inst(PPC_INST_ADDC | ___PPC_RT(t) |		\
 					___PPC_RA(a) | ___PPC_RB(b) | 0x1)
+#define TEST_PADDI(t, a, i, pr)	ppc_inst_prefix((PPC_PREFIX_MLS | __PPC_PRFX_R(pr) |	\
+					IMM_H(i)),			\
+					(PPC_INST_ADDI |		\
+					___PPC_RT(t) | ___PPC_RA(a) |	\
+					IMM_L(i)))
+
+
 
 #define MAX_SUBTESTS	16
 
@@ -714,6 +721,7 @@ static void __init run_tests_load_store(void)
 
 struct compute_test {
 	char *mnemonic;
+	bool prefixed;
 	struct {
 		char *descr;
 		unsigned long flags;
@@ -1094,6 +1102,100 @@ static struct compute_test compute_tests[] = {
 				}
 			}
 		}
+	},
+	{
+		.mnemonic = "paddi",
+		.prefixed = true,
+		.subtests = {
+			{
+				.descr = "RA = LONG_MIN, SI = LONG_MIN",
+				.instr = TEST_PADDI(21, 22, LONG_MIN, 0),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[22] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RA = LONG_MIN, SI = LONG_MAX",
+				.instr = TEST_PADDI(21, 22, LONG_MAX, 0),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[22] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RA = LONG_MAX, SI = LONG_MAX",
+				.instr = TEST_PADDI(21, 22, LONG_MAX, 0),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RA = ULONG_MAX, SI = ULONG_MAX",
+				.instr = TEST_PADDI(21, 22, ULONG_MAX, 0),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[22] = ULONG_MAX,
+				}
+			},
+			{
+				.descr = "RA = ULONG_MAX, SI = 0x1",
+				.instr = TEST_PADDI(21, 22, 0x1, 0),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[22] = ULONG_MAX,
+				}
+			},
+			{
+				.descr = "RA = INT_MIN, SI = INT_MIN",
+				.instr = TEST_PADDI(21, 22, INT_MIN, 0),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[22] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RA = INT_MIN, SI = INT_MAX",
+				.instr = TEST_PADDI(21, 22, INT_MAX, 0),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[22] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RA = INT_MAX, SI = INT_MAX",
+				.instr = TEST_PADDI(21, 22, INT_MAX, 0),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[22] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RA = INT_MAX, SI = INT_MAX",
+				.instr = TEST_PADDI(21, 22, INT_MAX, 0),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[22] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RA = UINT_MAX, SI = 0x1",
+				.instr = TEST_PADDI(21, 22, 0x1, 0),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[22] = UINT_MAX,
+				}
+			},
+			{
+				.descr = "RA = UINT_MAX, SI = UINT_MAX",
+				.instr = TEST_PADDI(21, 22, UINT_MAX, 0),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[22] = UINT_MAX,
+				}
+			}
+		}
 	}
 };
 
@@ -1153,6 +1255,10 @@ static void __init run_tests_compute(void)
 
 	for (i = 0; i < ARRAY_SIZE(compute_tests); i++) {
 		test = &compute_tests[i];
+		if (test->prefixed && !cpu_has_feature(CPU_FTR_ARCH_31)) {
+			show_result(test->mnemonic, "SKIP (!CPU_FTR_ARCH_31)");
+			continue;
+		}
 
 		for (j = 0; j < MAX_SUBTESTS && test->subtests[j].descr; j++) {
 			instr = test->subtests[j].instr;
@@ -1161,6 +1267,8 @@ static void __init run_tests_compute(void)
 			ignore_xer = flags & IGNORE_XER;
 			ignore_ccr = flags & IGNORE_CCR;
 			passed = true;
+
+			regs->nip = ((unsigned long) &test->subtests[j].instr);
 
 			memcpy(&exp, regs, sizeof(struct pt_regs));
 			memcpy(&got, regs, sizeof(struct pt_regs));
