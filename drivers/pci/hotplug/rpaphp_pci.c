@@ -95,8 +95,11 @@ int rpaphp_enable_slot(struct slot *slot)
 			return -EINVAL;
 		}
 
-		if (list_empty(&bus->devices))
+		if (list_empty(&bus->devices)) {
+			// XXX: uh, do we have the rescan lock held here?
+			pseries_eeh_init_edev_recursive(PCI_DN(slot->dn));
 			pci_hp_add_devices(bus);
+		}
 
 		if (!list_empty(&bus->devices)) {
 			slot->state = CONFIGURED;
