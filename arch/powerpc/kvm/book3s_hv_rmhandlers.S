@@ -522,7 +522,7 @@ kvm_unsplit_nap:
 	/* clear any pending message */
 BEGIN_FTR_SECTION
 	lis	r6, (PPC_DBELL_SERVER << (63-36))@h
-	PPC_MSGCLR(6)
+	PPC_STR_MSGCLR(6)
 END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 	/* Set kvm_split_mode.napped[tid] = 1 */
 	ld	r3, HSTATE_SPLIT_MODE(r13)
@@ -1414,7 +1414,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 	cmpwi	r12, BOOK3S_INTERRUPT_H_DOORBELL
 	bne	3f
 BEGIN_FTR_SECTION
-	PPC_MSGSYNC
+	PPC_STR_MSGSYNC
 	lwsync
 	/* always exit if we're running a nested guest */
 	ld	r0, VCPU_NESTED(r9)
@@ -1827,7 +1827,7 @@ BEGIN_FTR_SECTION
 	li	r7,0x400		/* IS field = 0b01 */
 	ptesync
 	sldi	r0,r3,32		/* RS has PID */
-1:	PPC_TLBIEL(7,0,2,1,1)		/* RIC=2, PRS=1, R=1 */
+1:	PPC_STR_TLBIEL(7,0,2,1,1)	/* RIC=2, PRS=1, R=1 */
 	addi	r7,r7,0x1000
 	bdnz	1b
 	ptesync
@@ -2121,7 +2121,7 @@ BEGIN_FTR_SECTION
 	b	4f
 END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
 	clrrdi	r0, r4, 28
-	PPC_SLBFEE_DOT(R5, R0)		/* if so, look up SLB */
+	PPC_STR_SLBFEE_DOT(R5, R0)	/* if so, look up SLB */
 	li	r0, BOOK3S_INTERRUPT_DATA_SEGMENT
 	bne	7f			/* if no SLB entry found */
 4:	std	r4, VCPU_FAULT_DAR(r9)
@@ -2213,7 +2213,7 @@ BEGIN_FTR_SECTION
 	b	4f
 END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
 	clrrdi	r0, r10, 28
-	PPC_SLBFEE_DOT(R5, R0)		/* if so, look up SLB */
+	PPC_STR_SLBFEE_DOT(R5, R0)	/* if so, look up SLB */
 	li	r0, BOOK3S_INTERRUPT_INST_SEGMENT
 	bne	7f			/* if no SLB entry found */
 4:
@@ -3003,11 +3003,11 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 	 * explicitly in the guest exit path.
 	 */
 	lis	r6, (PPC_DBELL_SERVER << (63-36))@h
-	PPC_MSGCLR(6)
+	PPC_STR_MSGCLR(6)
 	/* see if it's a host IPI */
 	li	r3, 1
 BEGIN_FTR_SECTION
-	PPC_MSGSYNC
+	PPC_STR_MSGSYNC
 	lwsync
 END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
 	lbz	r0, HSTATE_HOST_IPI(r13)
@@ -3156,7 +3156,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_P9_TM_XER_SO_BUG)
 
 	/* We have to treclaim here because that's the only way to do S->N */
 	li	r3, TM_CAUSE_KVM_RESCHED
-	TRECLAIM(R3)
+	PPC_STR_TRECLAIM(R3)
 
 	/*
 	 * We were in fake suspend, so we are not going to save the

@@ -242,7 +242,7 @@ static void pnv_smp_cpu_kill_self(void)
 			pnv_flush_interrupts();
 		} else if ((srr1 & wmask) == SRR1_WAKEHDBELL) {
 			unsigned long msg = PPC_DBELL_TYPE(PPC_DBELL_SERVER);
-			asm volatile(PPC_MSGCLR(%0) : : "r" (msg));
+			asm volatile(PPC_STR_MSGCLR(%0) : : "r" (msg));
 		} else if ((srr1 & wmask) == SRR1_WAKERESET) {
 			irq_set_pending_from_srr1(srr1);
 			/* Does not return */

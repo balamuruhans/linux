@@ -94,7 +94,7 @@ static void flush_erat(void)
 		return;
 	}
 #endif
-	asm volatile(PPC_ISA_3_0_INVALIDATE_ERAT : : :"memory");
+	asm volatile(PPC_STR_ISA_3_0_INVALIDATE_ERAT : : :"memory");
 }
 
 #define MCE_FLUSH_SLB 1

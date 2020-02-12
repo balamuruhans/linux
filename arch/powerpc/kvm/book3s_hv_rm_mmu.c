@@ -452,14 +452,14 @@ static inline void fixup_tlbie_lpid(unsigned long rb_value, unsigned long lpid)
 		 * re-order the tlbie
 		 */
 		asm volatile("ptesync": : :"memory");
-		asm volatile(PPC_TLBIE_5(%0, %4, %3, %2, %1)
+		asm volatile(PPC_STR_TLBIE_5(%0, %4, %3, %2, %1)
 			     : : "r"(rb), "i"(r), "i"(prs),
 			       "i"(ric), "r"(rs) : "memory");
 	}
 
 	if (cpu_has_feature(CPU_FTR_P9_TLBIE_STQ_BUG)) {
 		asm volatile("ptesync": : :"memory");
-		asm volatile(PPC_TLBIE_5(%0,%1,0,0,0) : :
+		asm volatile(PPC_STR_TLBIE_5(%0,%1,0,0,0) : :
 			     "r" (rb_value), "r" (lpid));
 	}
 }
@@ -478,7 +478,7 @@ static void do_tlbies(struct kvm *kvm, unsigned long *rbvalues,
 		if (need_sync)
 			asm volatile("ptesync" : : : "memory");
 		for (i = 0; i < npages; ++i) {
-			asm volatile(PPC_TLBIE_5(%0,%1,0,0,0) : :
+			asm volatile(PPC_STR_TLBIE_5(%0,%1,0,0,0) : :
 				     "r" (rbvalues[i]), "r" (kvm->arch.lpid));
 		}
 
@@ -488,7 +488,7 @@ static void do_tlbies(struct kvm *kvm, unsigned long *rbvalues,
 		if (need_sync)
 			asm volatile("ptesync" : : : "memory");
 		for (i = 0; i < npages; ++i) {
-			asm volatile(PPC_TLBIEL(%0,%1,0,0,0) : :
+			asm volatile(PPC_STR_TLBIEL(%0,%1,0,0,0) : :
 				     "r" (rbvalues[i]), "r" (0));
 		}
 		asm volatile("ptesync" : : : "memory");

@@ -232,12 +232,12 @@ _GLOBAL(book3e_start_thread)
 	/* If the thread id is invalid, just exit. */
 	b	13f
 10:
-	MTTMR(TMRN_IMSR0, 5)
-	MTTMR(TMRN_INIA0, 4)
+	PPC_STR_MTTMR(TMRN_IMSR0, 5)
+	PPC_STR_MTTMR(TMRN_INIA0, 4)
 	b	12f
 11:
-	MTTMR(TMRN_IMSR1, 5)
-	MTTMR(TMRN_INIA1, 4)
+	PPC_STR_MTTMR(TMRN_IMSR1, 5)
+	PPC_STR_MTTMR(TMRN_INIA1, 4)
 12:
 	isync
 	li	r6, 1

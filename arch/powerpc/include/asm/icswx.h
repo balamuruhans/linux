@@ -15,7 +15,7 @@
 #ifndef _ARCH_POWERPC_INCLUDE_ASM_ICSWX_H_
 #define _ARCH_POWERPC_INCLUDE_ASM_ICSWX_H_
 
-#include <asm/ppc-opcode.h> /* for PPC_ICSWX */
+#include <asm/ppc-opcode-raw.h> /* for PPC_ICSWX */
 
 /* Chapter 6.5.8 Coprocessor-Completion Block (CCB) */
 
@@ -171,7 +171,7 @@ static inline int icswx(__be32 ccw, struct coprocessor_request_block *crb)
 	u32 cr;
 
 	__asm__ __volatile__(
-	PPC_ICSWX(%1,0,%2) "\n"
+	PPC_STR_ICSWX(%1,0,%2) "\n"
 	"mfcr %0\n"
 	: "=r" (cr)
 	: "r" (ccw_reg), "r" (crb)

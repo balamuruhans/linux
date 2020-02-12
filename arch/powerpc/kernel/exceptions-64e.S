@@ -1496,7 +1496,7 @@ a2_tlbinit_after_linear_map:
 	.globl  a2_tlbinit_after_iprot_flush
 a2_tlbinit_after_iprot_flush:
 
-	PPC_TLBILX(0,0,R0)
+	PPC_STR_TLBILX(0,0,R0)
 	sync
 	isync
 

@@ -12,6 +12,7 @@
 #include <linux/threads.h>
 
 #include <asm/ppc-opcode.h>
+#include <asm/ppc-opcode-raw.h>
 #include <asm/feature-fixups.h>
 
 #define PPC_DBELL_MSG_BRDCAST	(0x04000000)
@@ -34,7 +35,8 @@ enum ppc_dbell {
 
 static inline void _ppc_msgsnd(u32 msg)
 {
-	__asm__ __volatile__ (ASM_FTR_IFSET(PPC_MSGSND(%1), PPC_MSGSNDP(%1), %0)
+	__asm__ __volatile__ (ASM_FTR_IFSET(PPC_STR_MSGSND(%1),
+				PPC_STR_MSGSNDP(%1), %0)
 				: : "i" (CPU_FTR_HVMODE), "r" (msg));
 }
 
@@ -48,13 +50,14 @@ static inline void ppc_msgsnd_sync(void)
 static inline void ppc_msgsync(void)
 {
 	/* sync is not required when taking messages from the same core */
-	__asm__ __volatile__ (ASM_FTR_IFSET(PPC_MSGSYNC " ; lwsync", "", %0)
+	__asm__ __volatile__ (ASM_FTR_IFSET(PPC_STR_MSGSYNC " ; lwsync", "", %0)
 				: : "i" (CPU_FTR_HVMODE|CPU_FTR_ARCH_300));
 }
 
 static inline void _ppc_msgclr(u32 msg)
 {
-	__asm__ __volatile__ (ASM_FTR_IFSET(PPC_MSGCLR(%1), PPC_MSGCLRP(%1), %0)
+	__asm__ __volatile__ (ASM_FTR_IFSET(PPC_STR_MSGCLR(%1),
+				PPC_STR_MSGCLRP(%1), %0)
 				: : "i" (CPU_FTR_HVMODE), "r" (msg));
 }
 
@@ -71,7 +74,7 @@ static inline void ppc_msgclr(enum ppc_dbell type)
 
 static inline void _ppc_msgsnd(u32 msg)
 {
-	__asm__ __volatile__ (PPC_MSGSND(%0) : : "r" (msg));
+	__asm__ __volatile__ (PPC_STR_MSGSND(%0) : : "r" (msg));
 }
 
 /* sync before sending message */

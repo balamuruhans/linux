@@ -423,7 +423,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 
 	/* tabort, this dooms the transaction, nothing else */
 	li	r9, (TM_CAUSE_SYSCALL|TM_CAUSE_PERSISTENT)
-	TABORT(R9)
+	PPC_STR_TABORT(R9)
 
 	/*
 	 * Return directly to userspace. We have corrupted user register state,

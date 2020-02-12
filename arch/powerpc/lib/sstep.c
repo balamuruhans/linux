@@ -1309,19 +1309,19 @@ int analyse_instr(struct instruction_op *op, const struct pt_regs *regs,
 
 		switch (instr & 0x3f) {
 		case 48:	/* maddhd */
-			asm volatile(PPC_MADDHD(%0, %1, %2, %3) :
+			asm volatile(PPC_STR_MADDHD(%0, %1, %2, %3) :
 				     "=r" (op->val) : "r" (regs->gpr[ra]),
 				     "r" (regs->gpr[rb]), "r" (regs->gpr[rc]));
 			goto compute_done;
 
 		case 49:	/* maddhdu */
-			asm volatile(PPC_MADDHDU(%0, %1, %2, %3) :
+			asm volatile(PPC_STR_MADDHDU(%0, %1, %2, %3) :
 				     "=r" (op->val) : "r" (regs->gpr[ra]),
 				     "r" (regs->gpr[rb]), "r" (regs->gpr[rc]));
 			goto compute_done;
 
 		case 51:	/* maddld */
-			asm volatile(PPC_MADDLD(%0, %1, %2, %3) :
+			asm volatile(PPC_STR_MADDLD(%0, %1, %2, %3) :
 				     "=r" (op->val) : "r" (regs->gpr[ra]),
 				     "r" (regs->gpr[rb]), "r" (regs->gpr[rc]));
 			goto compute_done;
@@ -1743,17 +1743,17 @@ int analyse_instr(struct instruction_op *op, const struct pt_regs *regs,
 			switch (ra & 0x3) {
 			case 0:
 				/* 32-bit conditioned */
-				asm volatile(PPC_DARN(%0, 0) : "=r" (op->val));
+				asm volatile(PPC_STR_DARN(%0, 0) : "=r" (op->val));
 				goto compute_done;
 
 			case 1:
 				/* 64-bit conditioned */
-				asm volatile(PPC_DARN(%0, 1) : "=r" (op->val));
+				asm volatile(PPC_STR_DARN(%0, 1) : "=r" (op->val));
 				goto compute_done;
 
 			case 2:
 				/* 64-bit raw */
-				asm volatile(PPC_DARN(%0, 2) : "=r" (op->val));
+				asm volatile(PPC_STR_DARN(%0, 2) : "=r" (op->val));
 				goto compute_done;
 			}
 

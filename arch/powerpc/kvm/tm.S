@@ -87,7 +87,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_P9_TM_HV_ASSIST)
 	li	r3, TM_CAUSE_KVM_RESCHED
 
 	/* All GPRs are volatile at this point. */
-	TRECLAIM(R3)
+	PPC_STR_TRECLAIM(R3)
 
 	/* Temporarily store r13 and r9 so we have some regs to play with */
 	SET_SCRATCH0(r13)
@@ -338,7 +338,7 @@ _GLOBAL(__kvmppc_restore_tm)
 	ld	31, VCPU_GPRS_TM(31)(r31)
 
 	/* TM checkpointed state is now setup.  All GPRs are now volatile. */
-	TRECHKPT
+	PPC_STR_TRECHKPT
 
 	/* Now let's get back the state we need. */
 	HMT_MEDIUM

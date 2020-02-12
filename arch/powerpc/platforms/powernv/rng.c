@@ -70,7 +70,7 @@ int powernv_get_random_darn(unsigned long *v)
 	unsigned long val;
 
 	/* Using DARN with L=1 - 64-bit conditioned random number */
-	asm volatile(PPC_DARN(%0, 1) : "=r"(val));
+	asm volatile(PPC_STR_DARN(%0, 1) : "=r"(val));
 
 	if (val == DARN_ERR)
 		return 0;

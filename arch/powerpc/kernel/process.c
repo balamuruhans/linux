@@ -1222,7 +1222,7 @@ struct task_struct *__switch_to(struct task_struct *prev,
 		 * prevent snooping, corruption or a covert channel.
 		 */
 		if (current->thread.used_vas)
-			asm volatile(PPC_CP_ABORT);
+			asm volatile(PPC_STR_CP_ABORT);
 	}
 #endif /* CONFIG_PPC_BOOK3S_64 */
 
@@ -1475,7 +1475,7 @@ int set_thread_uses_vas(void)
 	 *
 	 * __switch_to() will issue CP_ABORT on future context switches.
 	 */
-	asm volatile(PPC_CP_ABORT);
+	asm volatile(PPC_STR_CP_ABORT);
 
 #endif /* CONFIG_PPC_BOOK3S_64 */
 	return 0;

@@ -196,7 +196,7 @@ static bool kvmppc_ipi_thread(int cpu)
 	if (cpu_has_feature(CPU_FTR_ARCH_300)) {
 		msg |= get_hard_smp_processor_id(cpu);
 		smp_mb();
-		__asm__ __volatile__ (PPC_MSGSND(%0) : : "r" (msg));
+		__asm__ __volatile__ (PPC_STR_MSGSND(%0) : : "r" (msg));
 		return true;
 	}
 
@@ -207,7 +207,7 @@ static bool kvmppc_ipi_thread(int cpu)
 		    cpu_first_thread_sibling(smp_processor_id())) {
 			msg |= cpu_thread_in_core(cpu);
 			smp_mb();
-			__asm__ __volatile__ (PPC_MSGSND(%0) : : "r" (msg));
+			__asm__ __volatile__ (PPC_STR_MSGSND(%0) : : "r" (msg));
 			preempt_enable();
 			return true;
 		}

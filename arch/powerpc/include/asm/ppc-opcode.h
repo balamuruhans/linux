@@ -429,105 +429,100 @@
 #endif
 
 /* Deal with instructions that older assemblers aren't aware of */
-#define	PPC_CP_ABORT		stringify_in_c(.long PPC_INST_CP_ABORT)
-#define	PPC_COPY(a, b)		stringify_in_c(.long PPC_INST_COPY | \
-					___PPC_RA(a) | ___PPC_RB(b))
-#define PPC_DARN(t, l)		stringify_in_c(.long PPC_INST_DARN |  \
-						___PPC_RT(t)	   |  \
-						(((l) & 0x3) << 16))
-#define	PPC_DCBAL(a, b)		stringify_in_c(.long PPC_INST_DCBAL | \
-					__PPC_RA(a) | __PPC_RB(b))
-#define	PPC_DCBZL(a, b)		stringify_in_c(.long PPC_INST_DCBZL | \
-					__PPC_RA(a) | __PPC_RB(b))
-#define PPC_LQARX(t, a, b, eh)	stringify_in_c(.long PPC_INST_LQARX | \
+#define	PPC_CP_ABORT		(PPC_INST_CP_ABORT)
+#define	PPC_COPY(a, b)		(PPC_INST_COPY | ___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_DARN(t, l)		(PPC_INST_DARN | ___PPC_RT(t) |	\
+					(((l) & 0x3) << 16))
+#define	PPC_DCBAL(a, b)		(PPC_INST_DCBAL | __PPC_RA(a) | __PPC_RB(b))
+#define	PPC_DCBZL(a, b)		(PPC_INST_DCBZL | __PPC_RA(a) | __PPC_RB(b))
+#define PPC_LQARX(t, a, b, eh)	(PPC_INST_LQARX | ___PPC_RT(t) | \
+					___PPC_RA(a) | \
+					___PPC_RB(b) | __PPC_EH(eh))
+#define PPC_LDARX(t, a, b, eh)	(PPC_INST_LDARX | ___PPC_RT(t) | \
+					___PPC_RA(a) | \
+					___PPC_RB(b) | __PPC_EH(eh))
+#define PPC_LWARX(t, a, b, eh)	(PPC_INST_LWARX | \
 					___PPC_RT(t) | ___PPC_RA(a) | \
 					___PPC_RB(b) | __PPC_EH(eh))
-#define PPC_LDARX(t, a, b, eh)	stringify_in_c(.long PPC_INST_LDARX | \
-					___PPC_RT(t) | ___PPC_RA(a) | \
-					___PPC_RB(b) | __PPC_EH(eh))
-#define PPC_LWARX(t, a, b, eh)	stringify_in_c(.long PPC_INST_LWARX | \
-					___PPC_RT(t) | ___PPC_RA(a) | \
-					___PPC_RB(b) | __PPC_EH(eh))
-#define PPC_STQCX(t, a, b)	stringify_in_c(.long PPC_INST_STQCX | \
+#define PPC_STQCX(t, a, b)	(PPC_INST_STQCX | \
 					___PPC_RT(t) | ___PPC_RA(a) | \
 					___PPC_RB(b))
-#define PPC_MADDHD(t, a, b, c)	stringify_in_c(.long PPC_INST_MADDHD | \
+#define PPC_MADDHD(t, a, b, c)	(PPC_INST_MADDHD | \
 					___PPC_RT(t) | ___PPC_RA(a)  | \
 					___PPC_RB(b) | ___PPC_RC(c))
-#define PPC_MADDHDU(t, a, b, c)	stringify_in_c(.long PPC_INST_MADDHDU | \
+#define PPC_MADDHDU(t, a, b, c)	(PPC_INST_MADDHDU | \
 					___PPC_RT(t) | ___PPC_RA(a)   | \
 					___PPC_RB(b) | ___PPC_RC(c))
-#define PPC_MADDLD(t, a, b, c)	stringify_in_c(.long PPC_INST_MADDLD | \
+#define PPC_MADDLD(t, a, b, c)	(PPC_INST_MADDLD | \
 					___PPC_RT(t) | ___PPC_RA(a)  | \
 					___PPC_RB(b) | ___PPC_RC(c))
-#define PPC_MSGSND(b)		stringify_in_c(.long PPC_INST_MSGSND | \
-					___PPC_RB(b))
-#define PPC_MSGSYNC		stringify_in_c(.long PPC_INST_MSGSYNC)
-#define PPC_MSGCLR(b)		stringify_in_c(.long PPC_INST_MSGCLR | \
-					___PPC_RB(b))
-#define PPC_MSGSNDP(b)		stringify_in_c(.long PPC_INST_MSGSNDP | \
-					___PPC_RB(b))
-#define PPC_MSGCLRP(b)		stringify_in_c(.long PPC_INST_MSGCLRP | \
-					___PPC_RB(b))
-#define PPC_PASTE(a, b)		stringify_in_c(.long PPC_INST_PASTE | \
-					___PPC_RA(a) | ___PPC_RB(b))
-#define PPC_POPCNTB(a, s)	stringify_in_c(.long PPC_INST_POPCNTB | \
-					__PPC_RA(a) | __PPC_RS(s))
-#define PPC_POPCNTD(a, s)	stringify_in_c(.long PPC_INST_POPCNTD | \
-					__PPC_RA(a) | __PPC_RS(s))
-#define PPC_POPCNTW(a, s)	stringify_in_c(.long PPC_INST_POPCNTW | \
-					__PPC_RA(a) | __PPC_RS(s))
-#define PPC_RFCI		stringify_in_c(.long PPC_INST_RFCI)
-#define PPC_RFDI		stringify_in_c(.long PPC_INST_RFDI)
-#define PPC_RFMCI		stringify_in_c(.long PPC_INST_RFMCI)
-#define PPC_TLBILX(t, a, b)	stringify_in_c(.long PPC_INST_TLBILX | \
-					__PPC_T_TLB(t) | __PPC_RA0(a) | __PPC_RB(b))
+#define PPC_MSGSND(b)		(PPC_INST_MSGSND | ___PPC_RB(b))
+#define PPC_MSGSYNC		(PPC_INST_MSGSYNC)
+#define PPC_MSGCLR(b)		(PPC_INST_MSGCLR | ___PPC_RB(b))
+#define PPC_MSGSNDP(b)		(PPC_INST_MSGSNDP | ___PPC_RB(b))
+#define PPC_MSGCLRP(b)		(PPC_INST_MSGCLRP | ___PPC_RB(b))
+#define PPC_PASTE(a, b)		(PPC_INST_PASTE | ___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_POPCNTB(a, s)	(PPC_INST_POPCNTB | __PPC_RA(a) | __PPC_RS(s))
+#define PPC_POPCNTD(a, s)	(PPC_INST_POPCNTD | __PPC_RA(a) | __PPC_RS(s))
+#define PPC_POPCNTW(a, s)	(PPC_INST_POPCNTW | __PPC_RA(a) | __PPC_RS(s))
+#define PPC_RFCI		(PPC_INST_RFCI)
+#define PPC_RFDI		(PPC_INST_RFDI)
+#define PPC_RFMCI		(PPC_INST_RFMCI)
+#define PPC_TLBILX(t, a, b)	(PPC_INST_TLBILX | \
+					__PPC_T_TLB(t) | __PPC_RA0(a) | \
+					__PPC_RB(b))
 #define PPC_TLBILX_ALL(a, b)	PPC_TLBILX(0, a, b)
 #define PPC_TLBILX_PID(a, b)	PPC_TLBILX(1, a, b)
 #define PPC_TLBILX_VA(a, b)	PPC_TLBILX(3, a, b)
-#define PPC_WAIT(w)		stringify_in_c(.long PPC_INST_WAIT | \
-					__PPC_WC(w))
-#define PPC_TLBIE(lp,a) 	stringify_in_c(.long PPC_INST_TLBIE | \
-					       ___PPC_RB(a) | ___PPC_RS(lp))
-#define	PPC_TLBIE_5(rb,rs,ric,prs,r) \
-				stringify_in_c(.long PPC_INST_TLBIE | \
+#define PPC_WAIT(w)		(PPC_INST_WAIT | __PPC_WC(w))
+#define PPC_TLBIE(lp, a)	(PPC_INST_TLBIE | ___PPC_RB(a) | ___PPC_RS(lp))
+#define	PPC_TLBIE_5(rb, rs, ric, prs, r) \
+				(PPC_INST_TLBIE | \
 					___PPC_RB(rb) | ___PPC_RS(rs) | \
 					___PPC_RIC(ric) | ___PPC_PRS(prs) | \
 					___PPC_R(r))
-#define	PPC_TLBIEL(rb,rs,ric,prs,r) \
-				stringify_in_c(.long PPC_INST_TLBIEL | \
+#define	PPC_TLBIEL(rb, rs, ric, prs, r) \
+				(PPC_INST_TLBIEL | \
 					___PPC_RB(rb) | ___PPC_RS(rs) | \
 					___PPC_RIC(ric) | ___PPC_PRS(prs) | \
 					___PPC_R(r))
-#define PPC_TLBSRX_DOT(a,b)	stringify_in_c(.long PPC_INST_TLBSRX_DOT | \
+#define PPC_TLBSRX_DOT(a, b)	(PPC_INST_TLBSRX_DOT | \
 					__PPC_RA0(a) | __PPC_RB(b))
-#define PPC_TLBIVAX(a,b)	stringify_in_c(.long PPC_INST_TLBIVAX | \
+#define PPC_TLBIVAX(a, b)	(PPC_INST_TLBIVAX | \
 					__PPC_RA0(a) | __PPC_RB(b))
 
-#define PPC_ERATWE(s, a, w)	stringify_in_c(.long PPC_INST_ERATWE | \
-					__PPC_RS(s) | __PPC_RA(a) | __PPC_WS(w))
-#define PPC_ERATRE(s, a, w)	stringify_in_c(.long PPC_INST_ERATRE | \
-					__PPC_RS(s) | __PPC_RA(a) | __PPC_WS(w))
-#define PPC_ERATILX(t, a, b)	stringify_in_c(.long PPC_INST_ERATILX | \
+#define PPC_ERATWE(s, a, w)	(PPC_INST_ERATWE | \
+					__PPC_RS(s) | __PPC_RA(a) | \
+					__PPC_WS(w))
+#define PPC_ERATRE(s, a, w)	(PPC_INST_ERATRE | \
+					__PPC_RS(s) | __PPC_RA(a) | \
+					__PPC_WS(w))
+#define PPC_ERATILX(t, a, b)	(PPC_INST_ERATILX | \
 					__PPC_T_TLB(t) | __PPC_RA0(a) | \
 					__PPC_RB(b))
-#define PPC_ERATIVAX(s, a, b)	stringify_in_c(.long PPC_INST_ERATIVAX | \
-					__PPC_RS(s) | __PPC_RA0(a) | __PPC_RB(b))
-#define PPC_ERATSX(t, a, w)	stringify_in_c(.long PPC_INST_ERATSX | \
-					__PPC_RS(t) | __PPC_RA0(a) | __PPC_RB(b))
-#define PPC_ERATSX_DOT(t, a, w)	stringify_in_c(.long PPC_INST_ERATSX_DOT | \
-					__PPC_RS(t) | __PPC_RA0(a) | __PPC_RB(b))
-#define PPC_SLBFEE_DOT(t, b)	stringify_in_c(.long PPC_INST_SLBFEE | \
+#define PPC_ERATIVAX(s, a, b)	(PPC_INST_ERATIVAX | \
+					__PPC_RS(s) | __PPC_RA0(a) | \
+					__PPC_RB(b))
+#define PPC_ERATSX(t, a, w)	(PPC_INST_ERATSX | \
+					__PPC_RS(t) | __PPC_RA0(a) | \
+					__PPC_RB(b))
+#define PPC_ERATSX_DOT(t, a, w)	(PPC_INST_ERATSX_DOT | \
+					__PPC_RS(t) | __PPC_RA0(a) | \
+					__PPC_RB(b))
+#define PPC_SLBFEE_DOT(t, b)	(PPC_INST_SLBFEE | \
 					__PPC_RT(t) | __PPC_RB(b))
-#define __PPC_SLBFEE_DOT(t, b)	stringify_in_c(.long PPC_INST_SLBFEE |	\
+#define __PPC_SLBFEE_DOT(t, b)	(PPC_INST_SLBFEE |	\
 					       ___PPC_RT(t) | ___PPC_RB(b))
-#define PPC_ICBT(c,a,b)		stringify_in_c(.long PPC_INST_ICBT | \
-				       __PPC_CT(c) | __PPC_RA0(a) | __PPC_RB(b))
+#define PPC_ICBT(c, a, b)	(PPC_INST_ICBT | \
+				       __PPC_CT(c) | __PPC_RA0(a) | \
+				       __PPC_RB(b))
 /* PASemi instructions */
-#define LBZCIX(t,a,b)		stringify_in_c(.long PPC_INST_LBZCIX | \
-				       __PPC_RT(t) | __PPC_RA(a) | __PPC_RB(b))
-#define STBCIX(s,a,b)		stringify_in_c(.long PPC_INST_STBCIX | \
-				       __PPC_RS(s) | __PPC_RA(a) | __PPC_RB(b))
+#define LBZCIX(t, a, b)		(PPC_INST_LBZCIX | \
+				       __PPC_RT(t) | __PPC_RA(a) | \
+				       __PPC_RB(b))
+#define STBCIX(s, a, b)		(PPC_INST_STBCIX | \
+				       __PPC_RS(s) | __PPC_RA(a) | \
+				       __PPC_RB(b))
 
 /*
  * Define what the VSX XX1 form instructions will look like, then add
@@ -535,68 +530,68 @@
  */
 #define VSX_XX1(s, a, b)	(__PPC_XS(s) | __PPC_RA(a) | __PPC_RB(b))
 #define VSX_XX3(t, a, b)	(__PPC_XT(t) | __PPC_XA(a) | __PPC_XB(b))
-#define STXVD2X(s, a, b)	stringify_in_c(.long PPC_INST_STXVD2X | \
+#define STXVD2X(s, a, b)	(PPC_INST_STXVD2X | \
 					       VSX_XX1((s), a, b))
-#define LXVD2X(s, a, b)		stringify_in_c(.long PPC_INST_LXVD2X | \
+#define LXVD2X(s, a, b)		(PPC_INST_LXVD2X | \
 					       VSX_XX1((s), a, b))
-#define MFVRD(a, t)		stringify_in_c(.long PPC_INST_MFVSRD | \
+#define MFVRD(a, t)		(PPC_INST_MFVSRD | \
 					       VSX_XX1((t)+32, a, R0))
-#define MTVRD(t, a)		stringify_in_c(.long PPC_INST_MTVSRD | \
+#define MTVRD(t, a)		(PPC_INST_MTVSRD | \
 					       VSX_XX1((t)+32, a, R0))
-#define VPMSUMW(t, a, b)	stringify_in_c(.long PPC_INST_VPMSUMW | \
+#define VPMSUMW(t, a, b)	(PPC_INST_VPMSUMW | \
 					       VSX_XX3((t), a, b))
-#define VPMSUMD(t, a, b)	stringify_in_c(.long PPC_INST_VPMSUMD | \
+#define VPMSUMD(t, a, b)	(PPC_INST_VPMSUMD | \
 					       VSX_XX3((t), a, b))
-#define XXLOR(t, a, b)		stringify_in_c(.long PPC_INST_XXLOR | \
+#define XXLOR(t, a, b)		(PPC_INST_XXLOR | \
 					       VSX_XX3((t), a, b))
-#define XXSWAPD(t, a)		stringify_in_c(.long PPC_INST_XXSWAPD | \
+#define XXSWAPD(t, a)		(PPC_INST_XXSWAPD | \
 					       VSX_XX3((t), a, a))
-#define XVCPSGNDP(t, a, b)	stringify_in_c(.long (PPC_INST_XVCPSGNDP | \
+#define XVCPSGNDP(t, a, b)	((PPC_INST_XVCPSGNDP | \
 					       VSX_XX3((t), (a), (b))))
 
 #define VPERMXOR(vrt, vra, vrb, vrc)				\
-	stringify_in_c(.long (PPC_INST_VPERMXOR |		\
+	((PPC_INST_VPERMXOR |		\
 			      ___PPC_RT(vrt) | ___PPC_RA(vra) | \
 			      ___PPC_RB(vrb) | (((vrc) & 0x1f) << 6)))
 
-#define PPC_NAP			stringify_in_c(.long PPC_INST_NAP)
-#define PPC_SLEEP		stringify_in_c(.long PPC_INST_SLEEP)
-#define PPC_WINKLE		stringify_in_c(.long PPC_INST_WINKLE)
+#define PPC_NAP			(PPC_INST_NAP)
+#define PPC_SLEEP		(PPC_INST_SLEEP)
+#define PPC_WINKLE		(PPC_INST_WINKLE)
 
-#define PPC_STOP		stringify_in_c(.long PPC_INST_STOP)
+#define PPC_STOP		(PPC_INST_STOP)
 
 /* BHRB instructions */
-#define PPC_CLRBHRB		stringify_in_c(.long PPC_INST_CLRBHRB)
-#define PPC_MFBHRBE(r, n)	stringify_in_c(.long PPC_INST_BHRBE | \
+#define PPC_CLRBHRB		(PPC_INST_CLRBHRB)
+#define PPC_MFBHRBE(r, n)	(PPC_INST_BHRBE | \
 						__PPC_RT(r) | \
 							(((n) & 0x3ff) << 11))
 
 /* Transactional memory instructions */
-#define TRECHKPT		stringify_in_c(.long PPC_INST_TRECHKPT)
-#define TRECLAIM(r)		stringify_in_c(.long PPC_INST_TRECLAIM \
+#define TRECHKPT		(PPC_INST_TRECHKPT)
+#define TRECLAIM(r)		(PPC_INST_TRECLAIM \
 					       | __PPC_RA(r))
-#define TABORT(r)		stringify_in_c(.long PPC_INST_TABORT \
+#define TABORT(r)		(PPC_INST_TABORT \
 					       | __PPC_RA(r))
 
 /* book3e thread control instructions */
 #define TMRN(x)			((((x) & 0x1f) << 16) | (((x) & 0x3e0) << 6))
-#define MTTMR(tmr, r)		stringify_in_c(.long PPC_INST_MTTMR | \
+#define MTTMR(tmr, r)		(PPC_INST_MTTMR | \
 					       TMRN(tmr) | ___PPC_RS(r))
-#define MFTMR(tmr, r)		stringify_in_c(.long PPC_INST_MFTMR | \
+#define MFTMR(tmr, r)		(PPC_INST_MFTMR | \
 					       TMRN(tmr) | ___PPC_RT(r))
 
 /* Coprocessor instructions */
-#define PPC_ICSWX(s, a, b)	stringify_in_c(.long PPC_INST_ICSWX |	\
+#define PPC_ICSWX(s, a, b)	(PPC_INST_ICSWX |	\
 					       ___PPC_RS(s) |		\
 					       ___PPC_RA(a) |		\
 					       ___PPC_RB(b))
-#define PPC_ICSWEPX(s, a, b)	stringify_in_c(.long PPC_INST_ICSWEPX | \
+#define PPC_ICSWEPX(s, a, b)	(PPC_INST_ICSWEPX | \
 					       ___PPC_RS(s) |		\
 					       ___PPC_RA(a) |		\
 					       ___PPC_RB(b))
 
-#define PPC_SLBIA(IH)	stringify_in_c(.long PPC_INST_SLBIA | \
-				       ((IH & 0x7) << 21))
+#define PPC_SLBIA(IH)	(PPC_INST_SLBIA | \
+				       (((IH) & 0x7) << 21))
 
 /*
  * These may only be used on ISA v3.0 or later (aka. CPU_FTR_ARCH_300, radix
@@ -608,11 +603,11 @@
 #define PPC_RADIX_INVALIDATE_ERAT_USER	PPC_SLBIA(3)
 #define PPC_RADIX_INVALIDATE_ERAT_GUEST	PPC_SLBIA(6)
 
-#define VCMPEQUD_RC(vrt, vra, vrb)	stringify_in_c(.long PPC_INST_VCMPEQUD | \
+#define VCMPEQUD_RC(vrt, vra, vrb)	(PPC_INST_VCMPEQUD | \
 			      ___PPC_RT(vrt) | ___PPC_RA(vra) | \
 			      ___PPC_RB(vrb) | __PPC_RC21)
 
-#define VCMPEQUB_RC(vrt, vra, vrb)	stringify_in_c(.long PPC_INST_VCMPEQUB | \
+#define VCMPEQUB_RC(vrt, vra, vrb)	(PPC_INST_VCMPEQUB | \
 			      ___PPC_RT(vrt) | ___PPC_RA(vra) | \
 			      ___PPC_RB(vrb) | __PPC_RC21)
 

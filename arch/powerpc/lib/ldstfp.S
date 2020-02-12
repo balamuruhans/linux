@@ -124,7 +124,7 @@ _GLOBAL(get_vsr)
 	nop
 reg = 1
 	.rept	63
-	XXLOR(0,reg,reg)
+	PPC_STR_XXLOR(0,reg,reg)
 	blr
 reg = reg + 1
 	.endr
@@ -143,7 +143,7 @@ _GLOBAL(put_vsr)
 	nop
 reg = 1
 	.rept	63
-	XXLOR(reg,0,0)
+	PPC_STR_XXLOR(reg,0,0)
 	blr
 reg = reg + 1
 	.endr
@@ -165,14 +165,14 @@ _GLOBAL(load_vsrn)
 	MTMSRD(r7)
 	isync
 	beq	cr7,1f
-	STXVD2X(0,R1,R8)
-1:	LXVD2X(0,R0,R4)
+	PPC_STR_STXVD2X(0,R1,R8)
+1:	PPC_STR_LXVD2X(0,R0,R4)
 #ifdef __LITTLE_ENDIAN__
-	XXSWAPD(0,0)
+	PPC_STR_XXSWAPD(0,0)
 #endif
 	beq	cr7,4f
 	bl	put_vsr
-	LXVD2X(0,R1,R8)
+	PPC_STR_LXVD2X(0,R1,R8)
 4:	PPC_LL	r0,STKFRM+PPC_LR_STKOFF(r1)
 	mtlr	r0
 	MTMSRD(r6)
@@ -190,13 +190,13 @@ _GLOBAL(store_vsrn)
 	li	r8,STKFRM-16
 	MTMSRD(r7)
 	isync
-	STXVD2X(0,R1,R8)
+	PPC_STR_STXVD2X(0,R1,R8)
 	bl	get_vsr
 #ifdef __LITTLE_ENDIAN__
-	XXSWAPD(0,0)
+	PPC_STR_XXSWAPD(0,0)
 #endif
-	STXVD2X(0,R0,R4)
-	LXVD2X(0,R1,R8)
+	PPC_STR_STXVD2X(0,R0,R4)
+	PPC_STR_LXVD2X(0,R1,R8)
 	PPC_LL	r0,STKFRM+PPC_LR_STKOFF(r1)
 	mtlr	r0
 	MTMSRD(r6)

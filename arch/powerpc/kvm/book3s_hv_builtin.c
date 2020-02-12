@@ -240,7 +240,7 @@ void kvmhv_rm_send_ipi(int cpu)
 	/* On POWER9 we can use msgsnd for any destination cpu. */
 	if (cpu_has_feature(CPU_FTR_ARCH_300)) {
 		msg |= get_hard_smp_processor_id(cpu);
-		__asm__ __volatile__ (PPC_MSGSND(%0) : : "r" (msg));
+		__asm__ __volatile__ (PPC_STR_MSGSND(%0) : : "r" (msg));
 		return;
 	}
 
@@ -249,7 +249,7 @@ void kvmhv_rm_send_ipi(int cpu)
 	    cpu_first_thread_sibling(cpu) ==
 	    cpu_first_thread_sibling(raw_smp_processor_id())) {
 		msg |= cpu_thread_in_core(cpu);
-		__asm__ __volatile__ (PPC_MSGSND(%0) : : "r" (msg));
+		__asm__ __volatile__ (PPC_STR_MSGSND(%0) : : "r" (msg));
 		return;
 	}
 
@@ -719,7 +719,7 @@ void kvmhv_p9_set_lpcr(struct kvm_split_mode *sip)
 		for (set = 0; set < POWER9_TLB_SETS_RADIX; ++set) {
 			rb = TLBIEL_INVAL_SET_LPID +
 				(set << TLBIEL_INVAL_SET_SHIFT);
-			asm volatile(PPC_TLBIEL(%0, %1, 0, 0, 0) : :
+			asm volatile(PPC_STR_TLBIEL(%0, %1, 0, 0, 0) : :
 				     "r" (rb), "r" (0));
 		}
 		asm volatile("ptesync" : : : "memory");
@@ -864,28 +864,28 @@ static void flush_guest_tlb(struct kvm *kvm)
 	rb = PPC_BIT(52);	/* IS = 2 */
 	if (kvm_is_radix(kvm)) {
 		/* R=1 PRS=1 RIC=2 */
-		asm volatile(PPC_TLBIEL(%0, %4, %3, %2, %1)
+		asm volatile(PPC_STR_TLBIEL(%0, %4, %3, %2, %1)
 			     : : "r" (rb), "i" (1), "i" (1), "i" (2),
 			       "r" (0) : "memory");
 		for (set = 1; set < kvm->arch.tlb_sets; ++set) {
 			rb += PPC_BIT(51);	/* increment set number */
 			/* R=1 PRS=1 RIC=0 */
-			asm volatile(PPC_TLBIEL(%0, %4, %3, %2, %1)
+			asm volatile(PPC_STR_TLBIEL(%0, %4, %3, %2, %1)
 				     : : "r" (rb), "i" (1), "i" (1), "i" (0),
 				       "r" (0) : "memory");
 		}
 		asm volatile("ptesync": : :"memory");
-		asm volatile(PPC_RADIX_INVALIDATE_ERAT_GUEST : : :"memory");
+		asm volatile(PPC_STR_RADIX_INVALIDATE_ERAT_GUEST : : :"memory");
 	} else {
 		for (set = 0; set < kvm->arch.tlb_sets; ++set) {
 			/* R=0 PRS=0 RIC=0 */
-			asm volatile(PPC_TLBIEL(%0, %4, %3, %2, %1)
+			asm volatile(PPC_STR_TLBIEL(%0, %4, %3, %2, %1)
 				     : : "r" (rb), "i" (0), "i" (0), "i" (0),
 				       "r" (0) : "memory");
 			rb += PPC_BIT(51);	/* increment set number */
 		}
 		asm volatile("ptesync": : :"memory");
-		asm volatile(PPC_ISA_3_0_INVALIDATE_ERAT : : :"memory");
+		asm volatile(PPC_STR_ISA_3_0_INVALIDATE_ERAT : : :"memory");
 	}
 }
 

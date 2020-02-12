@@ -30,7 +30,7 @@
  */
 _GLOBAL(isa300_idle_stop_noloss)
 	mtspr 	SPRN_PSSCR,r3
-	PPC_STOP
+	PPC_STR_STOP
 	li	r3,0
 	blr
 
@@ -75,7 +75,7 @@ _GLOBAL(isa300_idle_stop_mayloss)
 	std	r4,-8*19(r1)
 	std	r5,-8*20(r1)
 	/* 168 bytes */
-	PPC_STOP
+	PPC_STR_STOP
 	b	.	/* catch bugs */
 
 /*
@@ -178,11 +178,11 @@ _GLOBAL(isa206_idle_insn_mayloss)
 	std	r5,-8*20(r1)
 	cmpwi	r3,PNV_THREAD_NAP
 	bne	1f
-	IDLE_STATE_ENTER_SEQ_NORET(PPC_NAP)
+	IDLE_STATE_ENTER_SEQ_NORET(PPC_STR_NAP)
 1:	cmpwi	r3,PNV_THREAD_SLEEP
 	bne	2f
-	IDLE_STATE_ENTER_SEQ_NORET(PPC_SLEEP)
-2:	IDLE_STATE_ENTER_SEQ_NORET(PPC_WINKLE)
+	IDLE_STATE_ENTER_SEQ_NORET(PPC_STR_SLEEP)
+2:	IDLE_STATE_ENTER_SEQ_NORET(PPC_STR_WINKLE)
 #endif
 
 #ifdef CONFIG_PPC_970_NAP

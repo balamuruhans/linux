@@ -400,7 +400,7 @@ label:
 	lwz	r11,GPR11(r8);						      \
 	mfspr	r8,SPRN_SPRG_RSCRATCH_DBG;				      \
 									      \
-	PPC_RFDI;							      \
+	PPC_STR_RFDI;							      \
 	b	.;							      \
 									      \
 	/* continue normal handling for a debug exception... */		      \

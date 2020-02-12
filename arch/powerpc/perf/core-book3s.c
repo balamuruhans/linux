@@ -360,7 +360,7 @@ static inline int siar_valid(struct pt_regs *regs)
 /* Reset all possible BHRB entries */
 static void power_pmu_bhrb_reset(void)
 {
-	asm volatile(PPC_CLRBHRB);
+	asm volatile(PPC_STR_CLRBHRB);
 }
 
 static void power_pmu_bhrb_enable(struct perf_event *event)

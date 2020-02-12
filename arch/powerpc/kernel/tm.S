@@ -88,7 +88,7 @@ _GLOBAL(tm_restore_sprs)
 
 	/* Passed an 8-bit failure cause as first argument. */
 _GLOBAL(tm_abort)
-	TABORT(R3)
+	PPC_STR_TABORT(R3)
 	blr
 EXPORT_SYMBOL_GPL(tm_abort);
 
@@ -162,7 +162,7 @@ _GLOBAL(tm_reclaim)
 	 * to user register state.  (FPRs, CCR etc. also!)
 	 * Use an sprg and a tm_scratch in the PACA to shuffle.
 	 */
-	TRECLAIM(R4)				/* Cause in r4 */
+	PPC_STR_TRECLAIM(R4)				/* Cause in r4 */
 
 	/*
 	 * ******************** GPRs ********************
@@ -490,7 +490,7 @@ restore_gprs:
 	ld	r1, -16(r1)
 
 	/* Commit register state as checkpointed state: */
-	TRECHKPT
+	PPC_STR_TRECHKPT
 
 	HMT_MEDIUM
 

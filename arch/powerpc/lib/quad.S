@@ -35,7 +35,7 @@ _GLOBAL(do_stq)
 
 /* do_lqarx(unsigned long ea, unsigned long *regs) */
 _GLOBAL(do_lqarx)
-1:	PPC_LQARX(6, 0, 3, 0)
+1:	PPC_STR_LQARX(6, 0, 3, 0)
 	std	r6, 0(r4)
 	std	r7, 8(r4)
 	li	r3, 0
@@ -48,7 +48,7 @@ _GLOBAL(do_lqarx)
 	    unsigned int *crp) */
 
 _GLOBAL(do_stqcx)
-1:	PPC_STQCX(4, 0, 3)
+1:	PPC_STR_STQCX(4, 0, 3)
 	mfcr	r5
 	stw	r5, 0(r6)
 	li	r3, 0

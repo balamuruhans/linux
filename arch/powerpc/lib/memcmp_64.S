@@ -470,11 +470,11 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 5:
 	lvx 	v0,0,r3
 	lvx 	v1,0,r4
-	VCMPEQUD_RC(v0,v0,v1)
+	PPC_STR_VCMPEQUD_RC(v0,v0,v1)
 	bnl	cr6,7f
 	lvx 	v0,off16,r3
 	lvx 	v1,off16,r4
-	VCMPEQUD_RC(v0,v0,v1)
+	PPC_STR_VCMPEQUD_RC(v0,v0,v1)
 	bnl	cr6,6f
 	addi	r3,r3,32
 	addi	r4,r4,32
@@ -583,7 +583,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 	LD_VSR_CROSS16B(r3,v3,v5,v7,v9)
 	LD_VSR_CROSS16B(r4,v4,v6,v8,v10)
 
-	VCMPEQUB_RC(v7,v9,v10)
+	PPC_STR_VCMPEQUB_RC(v7,v9,v10)
 	bnl	cr6,.Ldiffoffset_vmx_diff_found
 
 	subfic  r6,r6,16
@@ -604,7 +604,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 	/* the first qw of r4 was saved in v6 */
 	lvx	v9,0,r3
 	LD_VSR_CROSS16B(r4,v4,v6,v8,v10)
-	VCMPEQUB_RC(v7,v9,v10)
+	PPC_STR_VCMPEQUB_RC(v7,v9,v10)
 	vor	v6,v8,v8
 	bnl	cr6,.Ldiffoffset_vmx_diff_found
 
@@ -613,7 +613,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 
 	lvx	v9,0,r3
 	LD_VSR_CROSS16B(r4,v4,v6,v8,v10)
-	VCMPEQUB_RC(v7,v9,v10)
+	PPC_STR_VCMPEQUB_RC(v7,v9,v10)
 	vor	v6,v8,v8
 	bnl	cr6,.Ldiffoffset_vmx_diff_found
 

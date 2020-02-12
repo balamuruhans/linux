@@ -754,8 +754,8 @@
 
 #ifndef __ASSEMBLY__
 #define mftmr(rn)	({unsigned long rval; \
-			asm volatile(MFTMR(rn, %0) : "=r" (rval)); rval;})
-#define mttmr(rn, v)	asm volatile(MTTMR(rn, %0) : \
+			asm volatile(PPC_STR_MFTMR(rn, %0) : "=r" (rval)); rval;})
+#define mttmr(rn, v)	asm volatile(PPC_STR_MTTMR(rn, %0) : \
 				     : "r" ((unsigned long)(v)) \
 				     : "memory")
 #endif /* !__ASSEMBLY__ */

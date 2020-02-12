@@ -199,7 +199,7 @@ _GLOBAL(_tlbivax_bcast)
 	wrteei	0
 	mtspr	SPRN_MMUCR,r5
 	isync
-	PPC_TLBIVAX(0, R3)
+	PPC_STR_TLBIVAX(0, R3)
 	isync
 	eieio
 	tlbsync
@@ -217,11 +217,11 @@ END_FTR_SECTION_IFSET(CPU_FTR_476_DD2)
 	bl	2f
 2:	mflr	r6
 	li	r7,32
-	PPC_ICBT(0,R6,R7)		/* touch next cache line */
+	PPC_STR_ICBT(0,R6,R7)		/* touch next cache line */
 	add	r6,r6,r7
-	PPC_ICBT(0,R6,R7)		/* touch next cache line */
+	PPC_STR_ICBT(0,R6,R7)		/* touch next cache line */
 	add	r6,r6,r7
-	PPC_ICBT(0,R6,R7)		/* touch next cache line */
+	PPC_STR_ICBT(0,R6,R7)		/* touch next cache line */
 	sync
 	nop
 	nop
@@ -369,7 +369,7 @@ _GLOBAL(_tlbivax_bcast)
 	beq	1f
 	rlwimi	r4,r6,MAS6_SIND_SHIFT,MAS6_SIND
 1:	mtspr	SPRN_MAS6,r4		/* assume AS=0 for now */
-	PPC_TLBIVAX(0,R3)
+	PPC_STR_TLBIVAX(0,R3)
 	eieio
 	tlbsync
 	sync

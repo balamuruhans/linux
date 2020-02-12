@@ -69,7 +69,7 @@ static void assert_slb_presence(bool present, unsigned long ea)
 	 * ignores all other bits from 0-27, so just clear them all.
 	 */
 	ea &= ~((1UL << 28) - 1);
-	asm volatile(__PPC_SLBFEE_DOT(%0, %1) : "=r"(tmp) : "r"(ea) : "cr0");
+	asm volatile(__PPC_STR_SLBFEE_DOT(%0, %1) : "=r"(tmp) : "r"(ea) : "cr0");
 
 	WARN_ON(present == (tmp == 0));
 #endif
@@ -422,7 +422,7 @@ void switch_slb(struct task_struct *tsk, struct mm_struct *mm)
 		 * switch_slb wants. So ARCH_300 does not use the slb
 		 * cache.
 		 */
-		asm volatile(PPC_SLBIA(3));
+		asm volatile(PPC_STR_SLBIA(3));
 	} else {
 		unsigned long offset = get_paca()->slb_cache_ptr;
 
@@ -459,7 +459,7 @@ void switch_slb(struct task_struct *tsk, struct mm_struct *mm)
 			unsigned long ksp_vsid_data =
 				be64_to_cpu(p->save_area[KSTACK_INDEX].vsid);
 
-			asm volatile(PPC_SLBIA(1) "\n"
+			asm volatile(PPC_STR_SLBIA(1) "\n"
 				     "slbmte	%0,%1\n"
 				     "isync"
 				     :: "r"(ksp_vsid_data),

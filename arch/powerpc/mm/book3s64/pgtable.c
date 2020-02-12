@@ -216,7 +216,7 @@ static void flush_partition(unsigned int lpid, bool radix)
 		radix__flush_all_lpid_guest(lpid);
 	} else {
 		asm volatile("ptesync" : : : "memory");
-		asm volatile(PPC_TLBIE_5(%0,%1,2,0,0) : :
+		asm volatile(PPC_STR_TLBIE_5(%0,%1,2,0,0) : :
 			     "r" (TLBIEL_INVAL_SET_LPID), "r" (lpid));
 		/* do we need fixup here ?*/
 		asm volatile("eieio; tlbsync; ptesync" : : : "memory");

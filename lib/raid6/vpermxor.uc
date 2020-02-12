@@ -61,7 +61,7 @@ static void noinline raid6_vpermxor$#_gen_syndrome_real(int disks, size_t bytes,
 			wp$$ = vec_xor(wp$$, wd$$);
 
 			/* Q syndrome */
-			asm(VPERMXOR(%0,%1,%2,%3):"=v"(wq$$):"v"(gf_high), "v"(gf_low), "v"(wq$$));
+			asm(PPC_STR_VPERMXOR(%0,%1,%2,%3):"=v"(wq$$):"v"(gf_high), "v"(gf_low), "v"(wq$$));
 			wq$$ = vec_xor(wq$$, wd$$);
 		}
 		*(unative_t *)&p[d+NSIZE*$$] = wp$$;

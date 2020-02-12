@@ -1847,7 +1847,7 @@ FTR_SECTION_ELSE
 
 	.Lreg=0
 	.rept 32
-	XVCPSGNDP(.Lreg,.Lreg,.Lreg)
+	PPC_STR_XVCPSGNDP(.Lreg,.Lreg,.Lreg)
 	.Lreg=.Lreg+1
 	.endr
 
@@ -1862,7 +1862,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
  */
 	.Lreg=32
 	.rept 32
-	XVCPSGNDP(.Lreg,.Lreg,.Lreg)
+	PPC_STR_XVCPSGNDP(.Lreg,.Lreg,.Lreg)
 	.Lreg=.Lreg+1
 	.endr
 
@@ -2351,12 +2351,12 @@ handle_dabr_fault:
  */
 h_doorbell_common_msgclr:
 	LOAD_REG_IMMEDIATE(r3, PPC_DBELL_MSGTYPE << (63-36))
-	PPC_MSGCLR(3)
+	PPC_STR_MSGCLR(3)
 	b 	h_doorbell_common
 
 doorbell_super_common_msgclr:
 	LOAD_REG_IMMEDIATE(r3, PPC_DBELL_MSGTYPE << (63-36))
-	PPC_MSGCLRP(3)
+	PPC_STR_MSGCLRP(3)
 	b 	doorbell_super_common
 
 /*

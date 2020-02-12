@@ -105,7 +105,7 @@ FUNC_START(CRC_FUNCTION_NAME)
 
 	/* Get the initial value into v8 */
 	vxor	v8,v8,v8
-	MTVRD(v8, R3)
+	PPC_STR_MTVRD(v8, R3)
 #ifdef REFLECT
 	vsldoi	v8,zeroes,v8,8	/* shift into bottom 32 bits */
 #else
@@ -203,42 +203,42 @@ FUNC_START(CRC_FUNCTION_NAME)
 	lvx	const2,0,r3
 
 	/* Second warm up pass */
-	VPMSUMD(v8,v16,const1)
+	PPC_STR_VPMSUMD(v8,v16,const1)
 	lvx	v16,0,r4
 	VPERM(v16,v16,v16,byteswap)
 	ori	r2,r2,0
 
-	VPMSUMD(v9,v17,const1)
+	PPC_STR_VPMSUMD(v9,v17,const1)
 	lvx	v17,off16,r4
 	VPERM(v17,v17,v17,byteswap)
 	ori	r2,r2,0
 
-	VPMSUMD(v10,v18,const1)
+	PPC_STR_VPMSUMD(v10,v18,const1)
 	lvx	v18,off32,r4
 	VPERM(v18,v18,v18,byteswap)
 	ori	r2,r2,0
 
-	VPMSUMD(v11,v19,const1)
+	PPC_STR_VPMSUMD(v11,v19,const1)
 	lvx	v19,off48,r4
 	VPERM(v19,v19,v19,byteswap)
 	ori	r2,r2,0
 
-	VPMSUMD(v12,v20,const1)
+	PPC_STR_VPMSUMD(v12,v20,const1)
 	lvx	v20,off64,r4
 	VPERM(v20,v20,v20,byteswap)
 	ori	r2,r2,0
 
-	VPMSUMD(v13,v21,const1)
+	PPC_STR_VPMSUMD(v13,v21,const1)
 	lvx	v21,off80,r4
 	VPERM(v21,v21,v21,byteswap)
 	ori	r2,r2,0
 
-	VPMSUMD(v14,v22,const1)
+	PPC_STR_VPMSUMD(v14,v22,const1)
 	lvx	v22,off96,r4
 	VPERM(v22,v22,v22,byteswap)
 	ori	r2,r2,0
 
-	VPMSUMD(v15,v23,const1)
+	PPC_STR_VPMSUMD(v15,v23,const1)
 	lvx	v23,off112,r4
 	VPERM(v23,v23,v23,byteswap)
 
@@ -257,50 +257,50 @@ FUNC_START(CRC_FUNCTION_NAME)
 	ori	r2,r2,0
 
 	vxor	v0,v0,v8
-	VPMSUMD(v8,v16,const2)
+	PPC_STR_VPMSUMD(v8,v16,const2)
 	lvx	v16,0,r4
 	VPERM(v16,v16,v16,byteswap)
 	ori	r2,r2,0
 
 	vxor	v1,v1,v9
-	VPMSUMD(v9,v17,const2)
+	PPC_STR_VPMSUMD(v9,v17,const2)
 	lvx	v17,off16,r4
 	VPERM(v17,v17,v17,byteswap)
 	ori	r2,r2,0
 
 	vxor	v2,v2,v10
-	VPMSUMD(v10,v18,const2)
+	PPC_STR_VPMSUMD(v10,v18,const2)
 	lvx	v18,off32,r4
 	VPERM(v18,v18,v18,byteswap)
 	ori	r2,r2,0
 
 	vxor	v3,v3,v11
-	VPMSUMD(v11,v19,const2)
+	PPC_STR_VPMSUMD(v11,v19,const2)
 	lvx	v19,off48,r4
 	VPERM(v19,v19,v19,byteswap)
 	lvx	const2,0,r3
 	ori	r2,r2,0
 
 	vxor	v4,v4,v12
-	VPMSUMD(v12,v20,const1)
+	PPC_STR_VPMSUMD(v12,v20,const1)
 	lvx	v20,off64,r4
 	VPERM(v20,v20,v20,byteswap)
 	ori	r2,r2,0
 
 	vxor	v5,v5,v13
-	VPMSUMD(v13,v21,const1)
+	PPC_STR_VPMSUMD(v13,v21,const1)
 	lvx	v21,off80,r4
 	VPERM(v21,v21,v21,byteswap)
 	ori	r2,r2,0
 
 	vxor	v6,v6,v14
-	VPMSUMD(v14,v22,const1)
+	PPC_STR_VPMSUMD(v14,v22,const1)
 	lvx	v22,off96,r4
 	VPERM(v22,v22,v22,byteswap)
 	ori	r2,r2,0
 
 	vxor	v7,v7,v15
-	VPMSUMD(v15,v23,const1)
+	PPC_STR_VPMSUMD(v15,v23,const1)
 	lvx	v23,off112,r4
 	VPERM(v23,v23,v23,byteswap)
 
@@ -314,35 +314,35 @@ FUNC_START(CRC_FUNCTION_NAME)
 	addi	r3,r3,16
 
 	vxor	v0,v0,v8
-	VPMSUMD(v8,v16,const1)
+	PPC_STR_VPMSUMD(v8,v16,const1)
 	ori	r2,r2,0
 
 	vxor	v1,v1,v9
-	VPMSUMD(v9,v17,const1)
+	PPC_STR_VPMSUMD(v9,v17,const1)
 	ori	r2,r2,0
 
 	vxor	v2,v2,v10
-	VPMSUMD(v10,v18,const1)
+	PPC_STR_VPMSUMD(v10,v18,const1)
 	ori	r2,r2,0
 
 	vxor	v3,v3,v11
-	VPMSUMD(v11,v19,const1)
+	PPC_STR_VPMSUMD(v11,v19,const1)
 	ori	r2,r2,0
 
 	vxor	v4,v4,v12
-	VPMSUMD(v12,v20,const1)
+	PPC_STR_VPMSUMD(v12,v20,const1)
 	ori	r2,r2,0
 
 	vxor	v5,v5,v13
-	VPMSUMD(v13,v21,const1)
+	PPC_STR_VPMSUMD(v13,v21,const1)
 	ori	r2,r2,0
 
 	vxor	v6,v6,v14
-	VPMSUMD(v14,v22,const1)
+	PPC_STR_VPMSUMD(v14,v22,const1)
 	ori	r2,r2,0
 
 	vxor	v7,v7,v15
-	VPMSUMD(v15,v23,const1)
+	PPC_STR_VPMSUMD(v15,v23,const1)
 	ori	r2,r2,0
 
 .Lsecond_cool_down:
@@ -432,14 +432,14 @@ FUNC_START(CRC_FUNCTION_NAME)
 	lvx	v7,off112,r3
 	addi	r3,r3,8*16
 
-	VPMSUMW(v0,v16,v0)
-	VPMSUMW(v1,v17,v1)
-	VPMSUMW(v2,v18,v2)
-	VPMSUMW(v3,v19,v3)
-	VPMSUMW(v4,v20,v4)
-	VPMSUMW(v5,v21,v5)
-	VPMSUMW(v6,v22,v6)
-	VPMSUMW(v7,v23,v7)
+	PPC_STR_VPMSUMW(v0,v16,v0)
+	PPC_STR_VPMSUMW(v1,v17,v1)
+	PPC_STR_VPMSUMW(v2,v18,v2)
+	PPC_STR_VPMSUMW(v3,v19,v3)
+	PPC_STR_VPMSUMW(v4,v20,v4)
+	PPC_STR_VPMSUMW(v5,v21,v5)
+	PPC_STR_VPMSUMW(v6,v22,v6)
+	PPC_STR_VPMSUMW(v7,v23,v7)
 
 	/* Now reduce the tail (0 - 112 bytes) */
 	cmpdi	r7,0
@@ -448,49 +448,49 @@ FUNC_START(CRC_FUNCTION_NAME)
 	lvx	v16,0,r4
 	lvx	v17,0,r3
 	VPERM(v16,v16,v16,byteswap)
-	VPMSUMW(v16,v16,v17)
+	PPC_STR_VPMSUMW(v16,v16,v17)
 	vxor	v0,v0,v16
 	bdz	1f
 
 	lvx	v16,off16,r4
 	lvx	v17,off16,r3
 	VPERM(v16,v16,v16,byteswap)
-	VPMSUMW(v16,v16,v17)
+	PPC_STR_VPMSUMW(v16,v16,v17)
 	vxor	v0,v0,v16
 	bdz	1f
 
 	lvx	v16,off32,r4
 	lvx	v17,off32,r3
 	VPERM(v16,v16,v16,byteswap)
-	VPMSUMW(v16,v16,v17)
+	PPC_STR_VPMSUMW(v16,v16,v17)
 	vxor	v0,v0,v16
 	bdz	1f
 
 	lvx	v16,off48,r4
 	lvx	v17,off48,r3
 	VPERM(v16,v16,v16,byteswap)
-	VPMSUMW(v16,v16,v17)
+	PPC_STR_VPMSUMW(v16,v16,v17)
 	vxor	v0,v0,v16
 	bdz	1f
 
 	lvx	v16,off64,r4
 	lvx	v17,off64,r3
 	VPERM(v16,v16,v16,byteswap)
-	VPMSUMW(v16,v16,v17)
+	PPC_STR_VPMSUMW(v16,v16,v17)
 	vxor	v0,v0,v16
 	bdz	1f
 
 	lvx	v16,off80,r4
 	lvx	v17,off80,r3
 	VPERM(v16,v16,v16,byteswap)
-	VPMSUMW(v16,v16,v17)
+	PPC_STR_VPMSUMW(v16,v16,v17)
 	vxor	v0,v0,v16
 	bdz	1f
 
 	lvx	v16,off96,r4
 	lvx	v17,off96,r3
 	VPERM(v16,v16,v16,byteswap)
-	VPMSUMW(v16,v16,v17)
+	PPC_STR_VPMSUMW(v16,v16,v17)
 	vxor	v0,v0,v16
 
 	/* Now xor all the parallel chunks together */
@@ -529,9 +529,9 @@ FUNC_START(CRC_FUNCTION_NAME)
 	 * doing the computation 2x bits higher (ie 64 bits) and shifting the
 	 * result back down 2x bits, we round down to the nearest multiple.
 	 */
-	VPMSUMD(v1,v0,const1)	/* ma */
+	PPC_STR_VPMSUMD(v1,v0,const1)	/* ma */
 	vsldoi	v1,zeroes,v1,8	/* q = floor(ma/(2^64)) */
-	VPMSUMD(v1,v1,const2)	/* qn */
+	PPC_STR_VPMSUMD(v1,v1,const2)	/* qn */
 	vxor	v0,v0,v1	/* a - qn, subtraction is xor in GF(2) */
 
 	/*
@@ -549,9 +549,9 @@ FUNC_START(CRC_FUNCTION_NAME)
 	 * the algorithm because we don't carry in mod 2 arithmetic.
 	 */
 	vand	v1,v0,mask_32bit	/* bottom 32 bits of a */
-	VPMSUMD(v1,v1,const1)		/* ma */
+	PPC_STR_VPMSUMD(v1,v1,const1)	/* ma */
 	vand	v1,v1,mask_32bit	/* bottom 32bits of ma */
-	VPMSUMD(v1,v1,const2)		/* qn */
+	PPC_STR_VPMSUMD(v1,v1,const2)	/* qn */
 	vxor	v0,v0,v1		/* a - qn, subtraction is xor in GF(2) */
 
 	/*
@@ -564,7 +564,7 @@ FUNC_START(CRC_FUNCTION_NAME)
 #endif
 
 	/* Get it into r3 */
-	MFVRD(R3, v0)
+	PPC_STR_MFVRD(R3, v0)
 
 .Lout:
 	subi	r6,r1,56+10*16
@@ -595,14 +595,14 @@ FUNC_START(CRC_FUNCTION_NAME)
 	lvx	const1,0,r3
 	addi	r3,r3,16
 
-	VPMSUMD(v8,v16,const1)
-	VPMSUMD(v9,v17,const1)
-	VPMSUMD(v10,v18,const1)
-	VPMSUMD(v11,v19,const1)
-	VPMSUMD(v12,v20,const1)
-	VPMSUMD(v13,v21,const1)
-	VPMSUMD(v14,v22,const1)
-	VPMSUMD(v15,v23,const1)
+	PPC_STR_VPMSUMD(v8,v16,const1)
+	PPC_STR_VPMSUMD(v9,v17,const1)
+	PPC_STR_VPMSUMD(v10,v18,const1)
+	PPC_STR_VPMSUMD(v11,v19,const1)
+	PPC_STR_VPMSUMD(v12,v20,const1)
+	PPC_STR_VPMSUMD(v13,v21,const1)
+	PPC_STR_VPMSUMD(v14,v22,const1)
+	PPC_STR_VPMSUMD(v15,v23,const1)
 
 	b	.Lsecond_cool_down
 
@@ -628,49 +628,49 @@ FUNC_START(CRC_FUNCTION_NAME)
 	lvx	v16,0,r3
 	VPERM(v0,v0,v16,byteswap)
 	vxor	v0,v0,v8	/* xor in initial value */
-	VPMSUMW(v0,v0,v16)
+	PPC_STR_VPMSUMW(v0,v0,v16)
 	bdz	.Lv0
 
 	lvx	v1,off16,r4
 	lvx	v17,off16,r3
 	VPERM(v1,v1,v17,byteswap)
-	VPMSUMW(v1,v1,v17)
+	PPC_STR_VPMSUMW(v1,v1,v17)
 	bdz	.Lv1
 
 	lvx	v2,off32,r4
 	lvx	v16,off32,r3
 	VPERM(v2,v2,v16,byteswap)
-	VPMSUMW(v2,v2,v16)
+	PPC_STR_VPMSUMW(v2,v2,v16)
 	bdz	.Lv2
 
 	lvx	v3,off48,r4
 	lvx	v17,off48,r3
 	VPERM(v3,v3,v17,byteswap)
-	VPMSUMW(v3,v3,v17)
+	PPC_STR_VPMSUMW(v3,v3,v17)
 	bdz	.Lv3
 
 	lvx	v4,off64,r4
 	lvx	v16,off64,r3
 	VPERM(v4,v4,v16,byteswap)
-	VPMSUMW(v4,v4,v16)
+	PPC_STR_VPMSUMW(v4,v4,v16)
 	bdz	.Lv4
 
 	lvx	v5,off80,r4
 	lvx	v17,off80,r3
 	VPERM(v5,v5,v17,byteswap)
-	VPMSUMW(v5,v5,v17)
+	PPC_STR_VPMSUMW(v5,v5,v17)
 	bdz	.Lv5
 
 	lvx	v6,off96,r4
 	lvx	v16,off96,r3
 	VPERM(v6,v6,v16,byteswap)
-	VPMSUMW(v6,v6,v16)
+	PPC_STR_VPMSUMW(v6,v6,v16)
 	bdz	.Lv6
 
 	lvx	v7,off112,r4
 	lvx	v17,off112,r3
 	VPERM(v7,v7,v17,byteswap)
-	VPMSUMW(v7,v7,v17)
+	PPC_STR_VPMSUMW(v7,v7,v17)
 	bdz	.Lv7
 
 	addi	r3,r3,128
@@ -679,49 +679,49 @@ FUNC_START(CRC_FUNCTION_NAME)
 	lvx	v8,0,r4
 	lvx	v16,0,r3
 	VPERM(v8,v8,v16,byteswap)
-	VPMSUMW(v8,v8,v16)
+	PPC_STR_VPMSUMW(v8,v8,v16)
 	bdz	.Lv8
 
 	lvx	v9,off16,r4
 	lvx	v17,off16,r3
 	VPERM(v9,v9,v17,byteswap)
-	VPMSUMW(v9,v9,v17)
+	PPC_STR_VPMSUMW(v9,v9,v17)
 	bdz	.Lv9
 
 	lvx	v10,off32,r4
 	lvx	v16,off32,r3
 	VPERM(v10,v10,v16,byteswap)
-	VPMSUMW(v10,v10,v16)
+	PPC_STR_VPMSUMW(v10,v10,v16)
 	bdz	.Lv10
 
 	lvx	v11,off48,r4
 	lvx	v17,off48,r3
 	VPERM(v11,v11,v17,byteswap)
-	VPMSUMW(v11,v11,v17)
+	PPC_STR_VPMSUMW(v11,v11,v17)
 	bdz	.Lv11
 
 	lvx	v12,off64,r4
 	lvx	v16,off64,r3
 	VPERM(v12,v12,v16,byteswap)
-	VPMSUMW(v12,v12,v16)
+	PPC_STR_VPMSUMW(v12,v12,v16)
 	bdz	.Lv12
 
 	lvx	v13,off80,r4
 	lvx	v17,off80,r3
 	VPERM(v13,v13,v17,byteswap)
-	VPMSUMW(v13,v13,v17)
+	PPC_STR_VPMSUMW(v13,v13,v17)
 	bdz	.Lv13
 
 	lvx	v14,off96,r4
 	lvx	v16,off96,r3
 	VPERM(v14,v14,v16,byteswap)
-	VPMSUMW(v14,v14,v16)
+	PPC_STR_VPMSUMW(v14,v14,v16)
 	bdz	.Lv14
 
 	lvx	v15,off112,r4
 	lvx	v17,off112,r3
 	VPERM(v15,v15,v17,byteswap)
-	VPMSUMW(v15,v15,v17)
+	PPC_STR_VPMSUMW(v15,v15,v17)
 
 .Lv15:	vxor	v19,v19,v15
 .Lv14:	vxor	v20,v20,v14

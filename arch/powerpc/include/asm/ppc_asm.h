@@ -121,15 +121,15 @@ END_FW_FTR_SECTION_IFSET(FW_FEATURE_SPLPAR)
 #define REST_32VRS(n,b,base)	REST_16VRS(n,b,base); REST_16VRS(n+16,b,base)
 
 #ifdef __BIG_ENDIAN__
-#define STXVD2X_ROT(n,b,base)		STXVD2X(n,b,base)
-#define LXVD2X_ROT(n,b,base)		LXVD2X(n,b,base)
+#define STXVD2X_ROT(n,b,base)		PPC_STR_STXVD2X(n,b,base)
+#define LXVD2X_ROT(n,b,base)		PPC_STR_LXVD2X(n,b,base)
 #else
-#define STXVD2X_ROT(n,b,base)		XXSWAPD(n,n);		\
-					STXVD2X(n,b,base);	\
-					XXSWAPD(n,n)
+#define STXVD2X_ROT(n,b,base)		PPC_STR_XXSWAPD(n,n);		\
+					PPC_STR_STXVD2X(n,b,base);	\
+					PPC_STR_XXSWAPD(n,n)
 
-#define LXVD2X_ROT(n,b,base)		LXVD2X(n,b,base);	\
-					XXSWAPD(n,n)
+#define LXVD2X_ROT(n,b,base)		PPC_STR_LXVD2X(n,b,base);	\
+					PPC_STR_XXSWAPD(n,n)
 #endif
 /* Save the lower 32 VSRs in the thread VSR region */
 #define SAVE_VSR(n,b,base)	li b,16*(n);  STXVD2X_ROT(n,R##base,R##b)

@@ -26,6 +26,7 @@
 #include <asm/kexec.h>
 #include <asm/ppc-opcode.h>
 #include <asm/feature-fixups.h>
+#include <asm/ppc-opcode-raw.h>
 
 #include <misc/cxl-base.h>
 
@@ -67,7 +68,7 @@ static __always_inline void tlbiel_hash_set_isa300(unsigned int set, unsigned in
 	rb = (set << PPC_BITLSHIFT(51)) | (is << PPC_BITLSHIFT(53));
 	rs = ((unsigned long)pid << PPC_BITLSHIFT(31));
 
-	asm volatile(PPC_TLBIEL(%0, %1, %2, %3, %4)
+	asm volatile(PPC_STR_TLBIEL(%0, %1, %2, %3, %4)
 		     : : "r"(rb), "r"(rs), "i"(ric), "i"(prs), "r"(r)
 		     : "memory");
 }
@@ -112,7 +113,7 @@ static void tlbiel_all_isa300(unsigned int num_sets, unsigned int is)
 
 	asm volatile("ptesync": : :"memory");
 
-	asm volatile(PPC_ISA_3_0_INVALIDATE_ERAT "; isync" : : :"memory");
+	asm volatile(PPC_STR_ISA_3_0_INVALIDATE_ERAT "; isync" : : :"memory");
 }
 
 void hash__tlbiel_all(unsigned int action)
@@ -170,7 +171,7 @@ static inline unsigned long  ___tlbie(unsigned long vpn, int psize,
 		va |= ssize << 8;
 		sllp = get_sllp_encoding(apsize);
 		va |= sllp << 5;
-		asm volatile(ASM_FTR_IFCLR("tlbie %0,0", PPC_TLBIE(%1,%0), %2)
+		asm volatile(ASM_FTR_IFCLR("tlbie %0,0", PPC_STR_TLBIE(%1,%0), %2)
 			     : : "r" (va), "r"(0), "i" (CPU_FTR_ARCH_206)
 			     : "memory");
 		break;
@@ -189,7 +190,7 @@ static inline unsigned long  ___tlbie(unsigned long vpn, int psize,
 		 */
 		va |= (vpn & 0xfe); /* AVAL */
 		va |= 1; /* L */
-		asm volatile(ASM_FTR_IFCLR("tlbie %0,1", PPC_TLBIE(%1,%0), %2)
+		asm volatile(ASM_FTR_IFCLR("tlbie %0,1", PPC_STR_TLBIE(%1,%0), %2)
 			     : : "r" (va), "r"(0), "i" (CPU_FTR_ARCH_206)
 			     : "memory");
 		break;
@@ -216,7 +217,7 @@ static inline void fixup_tlbie_vpn(unsigned long vpn, int psize,
 		 * re-order the tlbie
 		 */
 		asm volatile("ptesync": : :"memory");
-		asm volatile(PPC_TLBIE_5(%0, %4, %3, %2, %1)
+		asm volatile(PPC_STR_TLBIE_5(%0, %4, %3, %2, %1)
 			     : : "r"(rb), "i"(r), "i"(prs),
 			       "i"(ric), "r"(rs) : "memory");
 	}
