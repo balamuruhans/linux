@@ -89,7 +89,7 @@ END_BTB_FLUSH_SECTION
 #endif
 
 	oris	r8, r6, MSR_CE@h
-	PPC_STD(r6, VCPU_SHARED_MSR, r11)
+	PPC_KVM_STD(r6, VCPU_SHARED_MSR, r11)
 	ori	r8, r8, MSR_ME | MSR_RI
 	PPC_STL	r5, VCPU_PC(r4)
 
@@ -386,17 +386,17 @@ _GLOBAL(kvmppc_resume_host)
 	PPC_LL	r3, PACA_SPRG_VDSO(r13)
 #endif
 	mfspr	r5, SPRN_SPRG9
-	PPC_STD(r6, VCPU_SHARED_SPRG4, r11)
+	PPC_KVM_STD(r6, VCPU_SHARED_SPRG4, r11)
 	mfspr	r8, SPRN_SPRG6
-	PPC_STD(r7, VCPU_SHARED_SPRG5, r11)
+	PPC_KVM_STD(r7, VCPU_SHARED_SPRG5, r11)
 	mfspr	r9, SPRN_SPRG7
 #ifdef CONFIG_64BIT
 	mtspr	SPRN_SPRG_VDSO_WRITE, r3
 #endif
-	PPC_STD(r5, VCPU_SPRG9, r4)
-	PPC_STD(r8, VCPU_SHARED_SPRG6, r11)
+	PPC_KVM_STD(r5, VCPU_SPRG9, r4)
+	PPC_KVM_STD(r8, VCPU_SHARED_SPRG6, r11)
 	mfxer	r3
-	PPC_STD(r9, VCPU_SHARED_SPRG7, r11)
+	PPC_KVM_STD(r9, VCPU_SHARED_SPRG7, r11)
 
 	/* save guest MAS registers and restore host mas4 & mas6 */
 	mfspr	r5, SPRN_MAS0
@@ -405,7 +405,7 @@ _GLOBAL(kvmppc_resume_host)
 	stw	r5, VCPU_SHARED_MAS0(r11)
 	mfspr	r7, SPRN_MAS2
 	stw	r6, VCPU_SHARED_MAS1(r11)
-	PPC_STD(r7, VCPU_SHARED_MAS2, r11)
+	PPC_KVM_STD(r7, VCPU_SHARED_MAS2, r11)
 	mfspr	r5, SPRN_MAS3
 	mfspr	r6, SPRN_MAS4
 	stw	r5, VCPU_SHARED_MAS7_3+4(r11)
@@ -602,7 +602,7 @@ lightweight_exit:
 	stw	r3, VCPU_HOST_MAS6(r4)
 	lwz	r3, VCPU_SHARED_MAS0(r11)
 	lwz	r5, VCPU_SHARED_MAS1(r11)
-	PPC_LD(r6, VCPU_SHARED_MAS2, r11)
+	PPC_KVM_LD(r6, VCPU_SHARED_MAS2, r11)
 	lwz	r7, VCPU_SHARED_MAS7_3+4(r11)
 	lwz	r8, VCPU_SHARED_MAS4(r11)
 	mtspr	SPRN_MAS0, r3
@@ -620,15 +620,15 @@ lightweight_exit:
 	 * SPRGs, so we need to reload them here with the guest's values.
 	 */
 	lwz	r3, VCPU_VRSAVE(r4)
-	PPC_LD(r5, VCPU_SHARED_SPRG4, r11)
+	PPC_KVM_LD(r5, VCPU_SHARED_SPRG4, r11)
 	mtspr	SPRN_VRSAVE, r3
-	PPC_LD(r6, VCPU_SHARED_SPRG5, r11)
+	PPC_KVM_LD(r6, VCPU_SHARED_SPRG5, r11)
 	mtspr	SPRN_SPRG4W, r5
-	PPC_LD(r7, VCPU_SHARED_SPRG6, r11)
+	PPC_KVM_LD(r7, VCPU_SHARED_SPRG6, r11)
 	mtspr	SPRN_SPRG5W, r6
-	PPC_LD(r8, VCPU_SHARED_SPRG7, r11)
+	PPC_KVM_LD(r8, VCPU_SHARED_SPRG7, r11)
 	mtspr	SPRN_SPRG6W, r7
-	PPC_LD(r5, VCPU_SPRG9, r4)
+	PPC_KVM_LD(r5, VCPU_SPRG9, r4)
 	mtspr	SPRN_SPRG7W, r8
 	mtspr	SPRN_SPRG9, r5
 
@@ -638,7 +638,7 @@ lightweight_exit:
 	PPC_LL	r6, VCPU_CTR(r4)
 	PPC_LL	r7, VCPU_CR(r4)
 	PPC_LL	r8, VCPU_PC(r4)
-	PPC_LD(r9, VCPU_SHARED_MSR, r11)
+	PPC_KVM_LD(r9, VCPU_SHARED_MSR, r11)
 	PPC_LL	r0, VCPU_GPR(R0)(r4)
 	PPC_LL	r1, VCPU_GPR(R1)(r4)
 	PPC_LL	r2, VCPU_GPR(R2)(r4)
