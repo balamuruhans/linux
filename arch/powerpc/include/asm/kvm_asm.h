@@ -11,11 +11,11 @@
 
 #ifdef __ASSEMBLY__
 #ifdef CONFIG_64BIT
-#define PPC_STD(sreg, offset, areg)  std sreg, (offset)(areg)
-#define PPC_LD(treg, offset, areg)   ld treg, (offset)(areg)
+#define PPC_KVM_STD(sreg, offset, areg)  (std sreg, (offset)(areg))
+#define PPC_KVM_LD(treg, offset, areg)   (ld treg, (offset)(areg))
 #else
-#define PPC_STD(sreg, offset, areg)  stw sreg, (offset+4)(areg)
-#define PPC_LD(treg, offset, areg)   lwz treg, (offset+4)(areg)
+#define PPC_KVM_STD(sreg, offset, areg)  (stw sreg, ((offset) + 4)(areg))
+#define PPC_KVM_LD(treg, offset, areg)   (lwz treg, ((offset) + 4)(areg))
 #endif
 #endif
 
