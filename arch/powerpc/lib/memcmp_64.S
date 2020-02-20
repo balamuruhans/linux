@@ -5,7 +5,7 @@
  */
 #include <asm/ppc_asm.h>
 #include <asm/export.h>
-#include <asm/ppc-opcode.h>
+#include <asm/ppc-opcode-raw.h>
 
 #define off8	r6
 #define off16	r7
