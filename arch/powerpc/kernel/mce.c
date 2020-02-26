@@ -534,7 +534,7 @@ void machine_check_print_event_info(struct machine_check_event *evt,
 			level, evt->cpu, current->pid, current->comm,
 			in_guest ? "Guest " : "", evt->srr0, pa_str);
 	} else {
-		printk("%sMCE: CPU%d: NIP: [%016llx] %pS%s\n",
+		printk("%sMCE: CPU%d: NIP: [%016llx] %pR%s\n",
 			level, evt->cpu, evt->srr0, (void *)evt->srr0, pa_str);
 	}
 

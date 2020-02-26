@@ -761,8 +761,8 @@ struct ipic * __init ipic_init(struct device_node *node, unsigned int flags)
 	ipic_write(ipic->regs, IPIC_SIMSR_H, 0);
 	ipic_write(ipic->regs, IPIC_SIMSR_L, 0);
 
-	printk ("IPIC (%d IRQ sources) at %p\n", NR_IPIC_INTS,
-			primary_ipic->regs);
+	printk ("IPIC (%d IRQ sources) at %pR\n", NR_IPIC_INTS,
+		primary_ipic->regs);
 
 	return ipic;
 }

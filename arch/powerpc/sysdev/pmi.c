@@ -158,7 +158,7 @@ static int pmi_of_probe(struct platform_device *dev)
 		goto error_cleanup_iomap;
 	}
 
-	printk(KERN_INFO "pmi: found pmi device at addr %p.\n", data->pmi_reg);
+	printk(KERN_INFO "pmi: found pmi device at addr %pR.\n", data->pmi_reg);
 
 	goto out;
 

@@ -375,7 +375,7 @@ static int lparcfg_count_active_processors(void)
 
 	for_each_node_by_type(cpus_dn, "cpu") {
 #ifdef LPARCFG_DEBUG
-		printk(KERN_ERR "cpus_dn %p\n", cpus_dn);
+		printk(KERN_ERR "cpus_dn %pOF\n", cpus_dn);
 #endif
 		count++;
 	}

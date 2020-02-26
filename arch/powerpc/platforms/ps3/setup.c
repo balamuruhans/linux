@@ -119,7 +119,7 @@ static void __init prealloc(struct ps3_prealloc *p)
 		panic("%s: Failed to allocate %lu bytes align=0x%lx\n",
 		      __func__, p->size, p->align);
 
-	printk(KERN_INFO "%s: %lu bytes at %p\n", p->name, p->size,
+	printk(KERN_INFO "%s: %lu bytes at %pR\n", p->name, p->size,
 	       p->address);
 }
 #endif

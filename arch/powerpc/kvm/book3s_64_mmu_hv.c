@@ -34,7 +34,7 @@
 #ifdef DEBUG_RESIZE_HPT
 #define resize_hpt_debug(resize, ...)				\
 	do {							\
-		printk(KERN_DEBUG "RESIZE HPT %p: ", resize);	\
+		printk(KERN_DEBUG "RESIZE HPT %pR: ", resize);	\
 		printk(__VA_ARGS__);				\
 	} while (0)
 #else
