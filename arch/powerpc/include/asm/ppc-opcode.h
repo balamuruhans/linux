@@ -611,4 +611,35 @@
 			      ___PPC_RT(vrt) | ___PPC_RA(vra) | \
 			      ___PPC_RB(vrb) | __PPC_RC21)
 
+#define PPC_LD(r, base, i)     (PPC_INST_LD | ___PPC_RT(r) |           \
+				___PPC_RA(base) | IMM_L(i))
+#define PPC_LWZ(r, base, i)    (PPC_INST_LWZ | ___PPC_RT(r) |          \
+				___PPC_RA(base) | IMM_L(i))
+#define PPC_LWZX(t, a, b)      (PPC_INST_LWZX | ___PPC_RT(t) |         \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_STD(r, base, i)    (PPC_INST_STD | ___PPC_RS(r) |          \
+				___PPC_RA(base) | ((i) & 0xfffc))
+#define PPC_STDCX(s, a, b)     (PPC_INST_STDCX | ___PPC_RS(s) |        \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_LFSX(t, a, b)      (PPC_INST_LFSX | ___PPC_RT(t) |         \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_STFSX(s, a, b)     (PPC_INST_STFSX | ___PPC_RS(s) |        \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_LFDX(t, a, b)      (PPC_INST_LFDX | ___PPC_RT(t) |         \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_STFDX(s, a, b)     (PPC_INST_STFDX | ___PPC_RS(s) |        \
+				 ___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_LVX(t, a, b)       (PPC_INST_LVX | ___PPC_RT(t) |          \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_STVX(s, a, b)      (PPC_INST_STVX | ___PPC_RS(s) |         \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_ADD(t, a, b)       (PPC_INST_ADD | ___PPC_RT(t) |          \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_ADD_DOT(t, a, b)   (PPC_INST_ADD | ___PPC_RT(t) |          \
+				___PPC_RA(a) | ___PPC_RB(b) | 0x1)
+#define PPC_ADDC(t, a, b)      (PPC_INST_ADDC | ___PPC_RT(t) |         \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_ADDC_DOT(t, a, b)  (PPC_INST_ADDC | ___PPC_RT(t) |         \
+				___PPC_RA(a) | ___PPC_RB(b) | 0x1)
+
 #endif /* _ASM_POWERPC_PPC_OPCODE_H */
