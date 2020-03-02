@@ -228,7 +228,7 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op, struct kprobe *p)
 	/* Setup template */
 	/* We can optimize this via patch_instruction_window later */
 	size = (TMPL_END_IDX * sizeof(kprobe_opcode_t)) / sizeof(int);
-	pr_devel("Copying template to %p, size %lu\n", buff, size);
+	pr_devel("Copying template to %px, size %lu\n", buff, size);
 	for (i = 0; i < size; i++) {
 		rc = patch_instruction(buff + i, *(optprobe_template_entry + i));
 		if (rc < 0)

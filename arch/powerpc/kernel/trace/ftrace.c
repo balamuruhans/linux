@@ -72,8 +72,8 @@ ftrace_modify_code(unsigned long ip, unsigned int old, unsigned int new)
 
 	/* Make sure it is what we expect it to be */
 	if (replaced != old) {
-		pr_err("%p: replaced (%#x) != old (%#x)",
-		(void *)ip, replaced, old);
+		pr_err("%pK: replaced (%#x) != old (%#x)",
+		       (void *)ip, replaced, old);
 		return -EINVAL;
 	}
 
@@ -356,7 +356,7 @@ static int setup_mcount_compiler_tramp(unsigned long tramp)
 	ptr = find_bl_target(tramp, op);
 
 	if (ptr != ppc_global_function_entry((void *)_mcount)) {
-		pr_debug("Trampoline target %p is not _mcount\n", (void *)ptr);
+		pr_debug("Trampoline target %px is not _mcount\n", (void *)ptr);
 		return -1;
 	}
 
@@ -457,7 +457,7 @@ int ftrace_make_nop(struct module *mod,
 		rec->arch.mod = mod;
 	} else if (mod) {
 		if (mod != rec->arch.mod) {
-			pr_err("Record mod %p not equal to passed in mod %p\n",
+			pr_err("Record mod %pK not equal to passed in mod %pK\n",
 			       rec->arch.mod, mod);
 			return -EINVAL;
 		}
@@ -520,8 +520,8 @@ __ftrace_make_call(struct dyn_ftrace *rec, unsigned long addr)
 		return -EFAULT;
 
 	if (!expected_nop_sequence(ip, op[0], op[1])) {
-		pr_err("Unexpected call sequence at %p: %x %x\n",
-		ip, op[0], op[1]);
+		pr_err("Unexpected call sequence at %pK: %x %x\n",
+		       ip, op[0], op[1]);
 		return -EINVAL;
 	}
 
@@ -635,12 +635,12 @@ static int __ftrace_make_call_kernel(struct dyn_ftrace *rec, unsigned long addr)
 
 	/* Make sure we have a nop */
 	if (probe_kernel_read(&op, ip, sizeof(op))) {
-		pr_err("Unable to read ftrace location %p\n", ip);
+		pr_err("Unable to read ftrace location %pK\n", ip);
 		return -EFAULT;
 	}
 
 	if (op != PPC_INST_NOP) {
-		pr_err("Unexpected call sequence at %p: %x\n", ip, op);
+		pr_err("Unexpected call sequence at %pK: %x\n", ip, op);
 		return -EINVAL;
 	}
 
