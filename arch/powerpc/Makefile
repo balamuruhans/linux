@@ -178,6 +178,10 @@ else
 CFLAGS-$(CONFIG_GENERIC_CPU) += -mcpu=powerpc64
 endif
 
+ifdef CONFIG_POWER_FUTURE_CPU
+CFLAGS-$(CONFIG_PPC64) += -mno-pcrel
+endif
+
 ifdef CONFIG_FUNCTION_TRACER
 CC_FLAGS_FTRACE := -pg
 ifdef CONFIG_MPROFILE_KERNEL
