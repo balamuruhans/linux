@@ -76,6 +76,9 @@
 #define	__REGA0_R30	30
 #define	__REGA0_R31	31
 
+#define IMM_L(i)               ((uintptr_t)(i) & 0xffff)
+#define IMM_DS(i)              ((uintptr_t)(i) & 0xfffc)
+
 /* opcode and xopcode for instructions */
 #define OP_TRAP 3
 #define OP_TRAP_64 2
@@ -613,6 +616,37 @@
 						___PPC_RT(vrt) | \
 						___PPC_RA(vra) | \
 						___PPC_RB(vrb) | __PPC_RC21)
+
+#define PPC_ENCODE_LD(r, base, i)     (PPC_INST_LD | ___PPC_RT(r) |           \
+				___PPC_RA(base) | IMM_DS(i))
+#define PPC_ENCODE_LWZ(r, base, i)    (PPC_INST_LWZ | ___PPC_RT(r) |          \
+				___PPC_RA(base) | IMM_L(i))
+#define PPC_ENCODE_LWZX(t, a, b)      (PPC_INST_LWZX | ___PPC_RT(t) |         \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_ENCODE_STD(r, base, i)    (PPC_INST_STD | ___PPC_RS(r) |          \
+				___PPC_RA(base) | IMM_DS(i))
+#define PPC_ENCODE_STDCX(s, a, b)     (PPC_INST_STDCX | ___PPC_RS(s) |        \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_ENCODE_LFSX(t, a, b)      (PPC_INST_LFSX | ___PPC_RT(t) |         \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_ENCODE_STFSX(s, a, b)     (PPC_INST_STFSX | ___PPC_RS(s) |        \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_ENCODE_LFDX(t, a, b)      (PPC_INST_LFDX | ___PPC_RT(t) |         \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_ENCODE_STFDX(s, a, b)     (PPC_INST_STFDX | ___PPC_RS(s) |        \
+				 ___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_ENCODE_LVX(t, a, b)       (PPC_INST_LVX | ___PPC_RT(t) |          \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_ENCODE_STVX(s, a, b)      (PPC_INST_STVX | ___PPC_RS(s) |         \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_ENCODE_ADD(t, a, b)       (PPC_INST_ADD | ___PPC_RT(t) |          \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_ENCODE_ADD_DOT(t, a, b)   (PPC_INST_ADD | ___PPC_RT(t) |          \
+				___PPC_RA(a) | ___PPC_RB(b) | 0x1)
+#define PPC_ENCODE_ADDC(t, a, b)      (PPC_INST_ADDC | ___PPC_RT(t) |         \
+				___PPC_RA(a) | ___PPC_RB(b))
+#define PPC_ENCODE_ADDC_DOT(t, a, b)  (PPC_INST_ADDC | ___PPC_RT(t) |         \
+				___PPC_RA(a) | ___PPC_RB(b) | 0x1)
 
 #define PPC_CP_ABORT        stringify_in_c(.long PPC_ENCODE_CP_ABORT)
 #define PPC_COPY(a, b)      stringify_in_c(.long PPC_ENCODE_COPY(a, b))
