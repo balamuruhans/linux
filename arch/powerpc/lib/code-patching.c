@@ -301,7 +301,7 @@ static int instr_is_branch_bform(ppc_inst instr)
 
 int instr_is_relative_branch(ppc_inst instr)
 {
-	if (instr & BRANCH_ABSOLUTE)
+	if (ppc_inst_mask(instr, BRANCH_ABSOLUTE))
 		return 0;
 
 	return instr_is_branch_iform(instr) || instr_is_branch_bform(instr);
@@ -309,20 +309,20 @@ int instr_is_relative_branch(ppc_inst instr)
 
 int instr_is_relative_link_branch(ppc_inst instr)
 {
-	return instr_is_relative_branch(instr) && (instr & BRANCH_SET_LINK);
+	return instr_is_relative_branch(instr) && ppc_inst_mask(instr, BRANCH_SET_LINK);
 }
 
 static unsigned long branch_iform_target(const ppc_inst *instr)
 {
 	signed long imm;
 
-	imm = *instr & 0x3FFFFFC;
+	imm = ppc_inst_mask(*instr, 0x3FFFFFC);
 
 	/* If the top bit of the immediate value is set this is negative */
 	if (imm & 0x2000000)
 		imm -= 0x4000000;
 
-	if ((*instr & BRANCH_ABSOLUTE) == 0)
+	if ((ppc_inst_mask(*instr, BRANCH_ABSOLUTE)) == 0)
 		imm += (unsigned long)instr;
 
 	return (unsigned long)imm;
@@ -332,13 +332,13 @@ static unsigned long branch_bform_target(const ppc_inst *instr)
 {
 	signed long imm;
 
-	imm = *instr & 0xFFFC;
+	imm = ppc_inst_mask(*instr, 0xFFFC);
 
 	/* If the top bit of the immediate value is set this is negative */
 	if (imm & 0x8000)
 		imm -= 0x10000;
 
-	if ((*instr & BRANCH_ABSOLUTE) == 0)
+	if ((ppc_inst_mask(*instr, BRANCH_ABSOLUTE)) == 0)
 		imm += (unsigned long)instr;
 
 	return (unsigned long)imm;

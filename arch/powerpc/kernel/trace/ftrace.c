@@ -98,19 +98,19 @@ static ppc_inst test_24bit_addr(unsigned long ip, unsigned long addr)
 
 static int is_bl_op(ppc_inst op)
 {
-	return (op & 0xfc000003) == 0x48000001;
+	return ppc_inst_mask(op, 0xfc000003) == 0x48000001;
 }
 
 static int is_b_op(ppc_inst op)
 {
-	return (op & 0xfc000003) == 0x48000000;
+	return ppc_inst_mask(op, 0xfc000003) == 0x48000000;
 }
 
 static unsigned long find_bl_target(unsigned long ip, ppc_inst op)
 {
 	int offset;
 
-	offset = (op & 0x03fffffc);
+	offset = ppc_inst_mask(op, 0x03fffffc);
 	/* make it signed */
 	if (offset & 0x02000000)
 		offset |= 0xfe000000;
@@ -494,7 +494,7 @@ expected_nop_sequence(void *ip, ppc_inst op0, ppc_inst op1)
 	 * The load offset is different depending on the ABI. For simplicity
 	 * just mask it out when doing the compare.
 	 */
-	if ((op0 != 0x48000008) || ((op1 & 0xffff0000) != 0xe8410000))
+	if ((op0 != 0x48000008) || (ppc_inst_mask(op1, 0xffff0000) != 0xe8410000))
 		return 0;
 	return 1;
 }
