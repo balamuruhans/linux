@@ -54,8 +54,8 @@ static int patch_alt_instruction(unsigned int *src, unsigned int *dest,
 
 		/* Branch within the section doesn't need translating */
 		if (target < alt_start || target > alt_end) {
-			instr = translate_branch(dest, src);
-			if (ppc_inst_null(instr))
+			instr = ppc_inst_word(translate_branch((ppc_inst *)dest, (ppc_inst *)src));
+			if (!instr)
 				return 1;
 		}
 	}

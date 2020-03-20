@@ -2871,9 +2871,9 @@ generic_inst_dump(unsigned long adr, long count, int praddr,
 		dotted = 0;
 		last_inst = inst;
 		if (praddr)
-			printf(REG"  %.8x", adr, inst);
+			printf(REG"  %.8x", adr, ppc_inst_word(inst));
 		printf("\t");
-		dump_func(inst, adr);
+		dump_func(ppc_inst_word(inst), adr);
 		printf("\n");
 	}
 	return adr - first_adr;

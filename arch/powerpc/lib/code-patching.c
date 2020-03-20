@@ -233,7 +233,7 @@ bool is_conditional_branch(ppc_inst instr)
 	if (opcode == 16)       /* bc, bca, bcl, bcla */
 		return true;
 	if (opcode == 19) {
-		switch ((instr >> 1) & 0x3ff) {
+		switch ((ppc_inst_word(instr) >> 1) & 0x3ff) {
 		case 16:        /* bclr, bclrl */
 		case 528:       /* bcctr, bcctrl */
 		case 560:       /* bctar, bctarl */

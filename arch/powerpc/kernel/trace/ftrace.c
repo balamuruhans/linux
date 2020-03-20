@@ -74,7 +74,7 @@ ftrace_modify_code(unsigned long ip, ppc_inst old, ppc_inst new)
 	/* Make sure it is what we expect it to be */
 	if (!ppc_inst_equal(replaced, old)) {
 		pr_err("%p: replaced (%#x) != old (%#x)",
-		(void *)ip, replaced, old);
+		(void *)ip, ppc_inst_word(replaced), ppc_inst_word(old));
 		return -EINVAL;
 	}
 
@@ -136,7 +136,7 @@ __ftrace_make_nop(struct module *mod,
 
 	/* Make sure that that this is still a 24bit jump */
 	if (!is_bl_op(op)) {
-		pr_err("Not expected bl: opcode is %x\n", op);
+		pr_err("Not expected bl: opcode is %x\n", ppc_inst_word(op));
 		return -EINVAL;
 	}
 
@@ -171,7 +171,7 @@ __ftrace_make_nop(struct module *mod,
 	/* We expect either a mflr r0, or a std r0, LRSAVE(r1) */
 	if (!ppc_inst_equal(op, PPC_INST(PPC_INST_MFLR)) &&
 	    !ppc_inst_equal(op, PPC_INST(PPC_INST_STD_LR))) {
-		pr_err("Unexpected instruction %08x around bl _mcount\n", op);
+		pr_err("Unexpected instruction %08x around bl _mcount\n", ppc_inst_word(op));
 		return -EINVAL;
 	}
 #else
@@ -201,7 +201,7 @@ __ftrace_make_nop(struct module *mod,
 	}
 
 	if (!ppc_inst_equal(op,  PPC_INST(PPC_INST_LD_TOC))) {
-		pr_err("Expected %08x found %08x\n", PPC_INST_LD_TOC, op);
+		pr_err("Expected %08x found %08x\n", PPC_INST_LD_TOC, ppc_inst_word(op));
 		return -EINVAL;
 	}
 #endif /* CONFIG_MPROFILE_KERNEL */
@@ -401,7 +401,7 @@ static int __ftrace_make_nop_kernel(struct dyn_ftrace *rec, unsigned long addr)
 
 	/* Make sure that that this is still a 24bit jump */
 	if (!is_bl_op(op)) {
-		pr_err("Not expected bl: opcode is %x\n", op);
+		pr_err("Not expected bl: opcode is %x\n", ppc_inst_word(op));
 		return -EINVAL;
 	}
 
@@ -525,7 +525,7 @@ __ftrace_make_call(struct dyn_ftrace *rec, unsigned long addr)
 
 	if (!expected_nop_sequence(ip, op[0], op[1])) {
 		pr_err("Unexpected call sequence at %p: %x %x\n",
-		ip, op[0], op[1]);
+		ip, ppc_inst_word(op[0]), ppc_inst_word(op[1]));
 		return -EINVAL;
 	}
 
@@ -644,7 +644,7 @@ static int __ftrace_make_call_kernel(struct dyn_ftrace *rec, unsigned long addr)
 	}
 
 	if (!ppc_inst_equal(op, PPC_INST(PPC_INST_NOP))) {
-		pr_err("Unexpected call sequence at %p: %x\n", ip, op);
+		pr_err("Unexpected call sequence at %p: %x\n", ip, ppc_inst_word(op));
 		return -EINVAL;
 	}
 
@@ -723,7 +723,7 @@ __ftrace_modify_call(struct dyn_ftrace *rec, unsigned long old_addr,
 
 	/* Make sure that that this is still a 24bit jump */
 	if (!is_bl_op(op)) {
-		pr_err("Not expected bl: opcode is %x\n", op);
+		pr_err("Not expected bl: opcode is %x\n", ppc_inst_word(op));
 		return -EINVAL;
 	}
 
