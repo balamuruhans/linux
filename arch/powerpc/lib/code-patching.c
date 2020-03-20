@@ -228,7 +228,7 @@ bool is_offset_in_branch_range(long offset)
  */
 bool is_conditional_branch(ppc_inst instr)
 {
-	unsigned int opcode = instr >> 26;
+	unsigned int opcode = ppc_inst_opcode(instr);
 
 	if (opcode == 16)       /* bc, bca, bcl, bcla */
 		return true;
@@ -286,7 +286,7 @@ unsigned int create_cond_branch(const unsigned int *addr,
 
 static unsigned int branch_opcode(ppc_inst instr)
 {
-	return (instr >> 26) & 0x3F;
+	return ppc_inst_opcode(instr) & 0x3F;
 }
 
 static int instr_is_branch_iform(ppc_inst instr)
