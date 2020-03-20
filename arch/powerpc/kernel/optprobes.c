@@ -259,7 +259,7 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op, struct kprobe *p)
 				(unsigned long)emulate_step_addr,
 				BRANCH_SET_LINK);
 
-	if (!branch_op_callback || !branch_emulate_step)
+	if (ppc_inst_null(branch_op_callback) || ppc_inst_null(branch_emulate_step))
 		goto error;
 
 	patch_instruction(buff + TMPL_CALL_HDLR_IDX, branch_op_callback);

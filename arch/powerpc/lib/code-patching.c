@@ -461,20 +461,20 @@ static void __init test_branch_iform(void)
 
 	/* Out of range relative negative offset, - 32 MB + 4*/
 	instr = create_branch(&instr, addr - 0x2000004, BRANCH_SET_LINK);
-	check(instr == 0);
+	check(ppc_inst_null(instr));
 
 	/* Out of range relative positive offset, + 32 MB */
 	instr = create_branch(&instr, addr + 0x2000000, BRANCH_SET_LINK);
-	check(instr == 0);
+	check(ppc_inst_null(instr));
 
 	/* Unaligned target */
 	instr = create_branch(&instr, addr + 3, BRANCH_SET_LINK);
-	check(instr == 0);
+	check(ppc_inst_null(instr));
 
 	/* Check flags are masked correctly */
 	instr = create_branch(&instr, addr, 0xFFFFFFFC);
 	check(instr_is_branch_to_addr(&instr, addr));
-	check(instr == PPC_INST(0x48000000));
+	check(ppc_inst_equal(instr, PPC_INST(0x48000000)));
 }
 
 static void __init test_create_function_call(void)
@@ -544,20 +544,20 @@ static void __init test_branch_bform(void)
 
 	/* Out of range relative negative offset, - 32 KB + 4*/
 	instr = create_cond_branch(iptr, addr - 0x8004, flags);
-	check(instr == 0);
+	check(ppc_inst_null(instr));
 
 	/* Out of range relative positive offset, + 32 KB */
 	instr = create_cond_branch(iptr, addr + 0x8000, flags);
-	check(instr == 0);
+	check(ppc_inst_null(instr));
 
 	/* Unaligned target */
 	instr = create_cond_branch(iptr, addr + 3, flags);
-	check(instr == 0);
+	check(ppc_inst_null(instr));
 
 	/* Check flags are masked correctly */
 	instr = create_cond_branch(iptr, addr, 0xFFFFFFFC);
 	check(instr_is_branch_to_addr(&instr, addr));
-	check(instr == 0x43FF0000);
+	check(ppc_inst_equal(instr, PPC_INST(0x43FF0000)));
 }
 
 static void __init test_translate_branch(void)

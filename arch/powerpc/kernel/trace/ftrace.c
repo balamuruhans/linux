@@ -72,7 +72,7 @@ ftrace_modify_code(unsigned long ip, ppc_inst old, ppc_inst new)
 		return -EFAULT;
 
 	/* Make sure it is what we expect it to be */
-	if (replaced != old) {
+	if (!ppc_inst_equal(replaced, old)) {
 		pr_err("%p: replaced (%#x) != old (%#x)",
 		(void *)ip, replaced, old);
 		return -EINVAL;
@@ -169,7 +169,8 @@ __ftrace_make_nop(struct module *mod,
 	}
 
 	/* We expect either a mflr r0, or a std r0, LRSAVE(r1) */
-	if (op != PPC_INST(PPC_INST_MFLR) && op != PPC_INST(PPC_INST_STD_LR)) {
+	if (!ppc_inst_equal(op, PPC_INST(PPC_INST_MFLR)) &&
+	    !ppc_inst_equal(op, PPC_INST(PPC_INST_STD_LR))) {
 		pr_err("Unexpected instruction %08x around bl _mcount\n", op);
 		return -EINVAL;
 	}
@@ -199,7 +200,7 @@ __ftrace_make_nop(struct module *mod,
 		return -EFAULT;
 	}
 
-	if (op != PPC_INST(PPC_INST_LD_TOC)) {
+	if (!ppc_inst_equal(op,  PPC_INST(PPC_INST_LD_TOC))) {
 		pr_err("Expected %08x found %08x\n", PPC_INST_LD_TOC, op);
 		return -EINVAL;
 	}
@@ -296,7 +297,7 @@ static unsigned long find_ftrace_tramp(unsigned long ip)
 	for (i = NUM_FTRACE_TRAMPS - 1; i >= 0; i--)
 		if (!ftrace_tramps[i])
 			continue;
-		else if (create_branch((void *)ip, ftrace_tramps[i], 0))
+		else if (!ppc_inst_null(create_branch((void *)ip, ftrace_tramps[i], 0)))
 			return ftrace_tramps[i];
 
 	return 0;
@@ -368,7 +369,7 @@ static int setup_mcount_compiler_tramp(unsigned long tramp)
 #else
 	ptr = ppc_global_function_entry((void *)ftrace_caller);
 #endif
-	if (!create_branch((void *)tramp, ptr, 0)) {
+	if (ppc_inst_null(create_branch((void *)tramp, ptr, 0))) {
 		pr_debug("%ps is not reachable from existing mcount tramp\n",
 				(void *)ptr);
 		return -1;
@@ -437,7 +438,7 @@ int ftrace_make_nop(struct module *mod,
 	 * then we had to use a trampoline to make the call.
 	 * Otherwise just update the call site.
 	 */
-	if (test_24bit_addr(ip, addr)) {
+	if (!ppc_inst_null(test_24bit_addr(ip, addr))) {
 		/* within range */
 		old = ftrace_call_replace(ip, addr, 1);
 		new = PPC_INST(PPC_INST_NOP);
@@ -494,7 +495,8 @@ expected_nop_sequence(void *ip, ppc_inst op0, ppc_inst op1)
 	 * The load offset is different depending on the ABI. For simplicity
 	 * just mask it out when doing the compare.
 	 */
-	if ((op0 != 0x48000008) || (ppc_inst_mask(op1, 0xffff0000) != 0xe8410000))
+	if ((!ppc_inst_equal(op0, PPC_INST(0x48000008)) ||
+	     ((ppc_inst_mask(op1, 0xffff0000) != 0xe8410000))
 		return 0;
 	return 1;
 }
@@ -503,7 +505,7 @@ static int
 expected_nop_sequence(void *ip, ppc_inst op0, ppc_inst op1)
 {
 	/* look for patched "NOP" on ppc64 with -mprofile-kernel */
-	if (op0 != PPC_INST(PPC_INST_NOP))
+	if (!ppc_inst_equal(op0, PPC_INST(PPC_INST_NOP)))
 		return 0;
 	return 1;
 }
@@ -559,7 +561,7 @@ __ftrace_make_call(struct dyn_ftrace *rec, unsigned long addr)
 	}
 
 	/* Ensure branch is within 24 bits */
-	if (!create_branch(ip, tramp, BRANCH_SET_LINK)) {
+	if (ppc_inst_null(create_branch(ip, tramp, BRANCH_SET_LINK))) {
 		pr_err("Branch out of range\n");
 		return -EINVAL;
 	}
@@ -584,7 +586,7 @@ __ftrace_make_call(struct dyn_ftrace *rec, unsigned long addr)
 		return -EFAULT;
 
 	/* It should be pointing to a nop */
-	if (op != PPC_INST(PPC_INST_NOP)) {
+	if (!ppc_inst_equal(op,  PPC_INST(PPC_INST_NOP))) {
 		pr_err("Expected NOP but have %x\n", op);
 		return -EINVAL;
 	}
@@ -641,7 +643,7 @@ static int __ftrace_make_call_kernel(struct dyn_ftrace *rec, unsigned long addr)
 		return -EFAULT;
 	}
 
-	if (op != PPC_INST(PPC_INST_NOP)) {
+	if (!ppc_inst_equal(op, PPC_INST(PPC_INST_NOP))) {
 		pr_err("Unexpected call sequence at %p: %x\n", ip, op);
 		return -EINVAL;
 	}
@@ -670,7 +672,7 @@ int ftrace_make_call(struct dyn_ftrace *rec, unsigned long addr)
 	 * then we had to use a trampoline to make the call.
 	 * Otherwise just update the call site.
 	 */
-	if (test_24bit_addr(ip, addr)) {
+	if (!ppc_inst_null(test_24bit_addr(ip, addr))) {
 		/* within range */
 		old = PPC_INST(PPC_INST_NOP);
 		new = ftrace_call_replace(ip, addr, 1);
@@ -748,7 +750,7 @@ __ftrace_modify_call(struct dyn_ftrace *rec, unsigned long old_addr,
 	}
 
 	/* The new target may be within range */
-	if (test_24bit_addr(ip, addr)) {
+	if (!ppc_inst_null(test_24bit_addr(ip, addr))) {
 		/* within range */
 		if (patch_branch((ppc_inst *)ip, addr, BRANCH_SET_LINK)) {
 			pr_err("REL24 out of range!\n");
@@ -778,7 +780,7 @@ __ftrace_modify_call(struct dyn_ftrace *rec, unsigned long old_addr,
 	}
 
 	/* Ensure branch is within 24 bits */
-	if (!create_branch((ppc_inst *)ip, tramp, BRANCH_SET_LINK)) {
+	if (ppc_inst_null(create_branch((ppc_inst *)ip, tramp, BRANCH_SET_LINK))) {
 		pr_err("Branch out of range\n");
 		return -EINVAL;
 	}
@@ -803,7 +805,8 @@ int ftrace_modify_call(struct dyn_ftrace *rec, unsigned long old_addr,
 	 * then we had to use a trampoline to make the call.
 	 * Otherwise just update the call site.
 	 */
-	if (test_24bit_addr(ip, addr) && test_24bit_addr(ip, old_addr)) {
+	if (!ppc_inst_null(test_24bit_addr(ip, addr)) &&
+	    !ppc_inst_null(test_24bit_addr(ip, old_addr))) {
 		/* within range */
 		old = ftrace_call_replace(ip, old_addr, 1);
 		new = ftrace_call_replace(ip, addr, 1);
