@@ -563,7 +563,7 @@ static void __init test_branch_bform(void)
 static void __init test_translate_branch(void)
 {
 	unsigned long addr;
-	ppc_inst *p, *q;
+	void *p, *q;
 	void *buf;
 
 	buf = vmalloc(PAGE_ALIGN(0x2000000 + 1));
@@ -576,7 +576,7 @@ static void __init test_translate_branch(void)
 	addr = (unsigned long)p;
 	patch_branch(p, addr, 0);
 	check(instr_is_branch_to_addr(p, addr));
-	q = p + 1;
+	q = buf + 4;
 	patch_instruction(q, translate_branch(q, p));
 	check(instr_is_branch_to_addr(q, addr));
 
@@ -626,7 +626,7 @@ static void __init test_translate_branch(void)
 	addr = (unsigned long)p;
 	patch_instruction(p, create_cond_branch(p, addr, 0));
 	check(instr_is_branch_to_addr(p, addr));
-	q = p + 1;
+	q = buf + 4;
 	patch_instruction(q, translate_branch(q, p));
 	check(instr_is_branch_to_addr(q, addr));
 
