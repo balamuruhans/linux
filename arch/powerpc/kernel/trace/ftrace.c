@@ -42,9 +42,24 @@
 static unsigned long ftrace_tramps[NUM_FTRACE_TRAMPS];
 
 static long
-read_inst(ppc_inst *inst, const void *src)
+read_inst(ppc_inst *p, const void *src)
 {
-	return probe_kernel_read((void *)inst, src, MCOUNT_INSN_SIZE);
+	ppc_inst inst;
+	long err;
+
+	err = probe_kernel_read((void *)&inst.prefix,
+				src, MCOUNT_INSN_SIZE);
+	if (err)
+		return err;
+
+	if (ppc_inst_prefixed(inst))
+		err = probe_kernel_read((void *)&inst.suffix,
+					src + 4, MCOUNT_INSN_SIZE);
+	if (err)
+		return err;
+
+	ppc_inst_write(p, inst);
+	return 0;
 }
 
 static ppc_inst

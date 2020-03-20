@@ -105,6 +105,28 @@ static inline int __access_ok(unsigned long addr, unsigned long size,
 #define __put_user_inatomic(x, ptr) \
 	__put_user_nosleep((__typeof__(*(ptr)))(x), (ptr), sizeof(*(ptr)))
 
+/*
+ * When reading an instruction iff it is a prefix, the suffix needs to be also
+ * loaded.
+ */
+#define __get_user_instr(x, ptr)			\
+({							\
+	long __gui_ret = 0;				\
+	__gui_ret = __get_user(x.prefix, (unsigned int __user *)ptr);		\
+	if (!__gui_ret && ppc_inst_prefixed(x))		\
+		__gui_ret = __get_user(x.suffix, (unsigned int __user *)ptr + 1);	\
+	__gui_ret;					\
+})
+
+#define __get_user_instr_inatomic(x, ptr)		\
+({							\
+	long __gui_ret = 0;				\
+	__gui_ret = __get_user_inatomic(x.prefix, (unsigned int __user *)ptr);		\
+	if (!__gui_ret && ppc_inst_prefixed(x))		\
+		__gui_ret = __get_user_inatomic(x.suffix, (unsigned int __user *)ptr + 1);	\
+	__gui_ret;					\
+})
+
 extern long __put_user_bad(void);
 
 /*

@@ -303,13 +303,14 @@ int fix_alignment(struct pt_regs *regs)
 	 */
 	CHECK_FULL_REGS(regs);
 
-	if (unlikely(__get_user(instr, (unsigned int __user *)regs->nip)))
+	if (unlikely(__get_user_instr(instr, (void __user *)regs->nip)))
 		return -EFAULT;
 	if ((regs->msr & MSR_LE) != (MSR_KERNEL & MSR_LE)) {
 		/* We don't handle PPC little-endian any more... */
 		if (cpu_has_feature(CPU_FTR_PPC_LE))
 			return -EIO;
-		instr = PPC_INST(swab32(ppc_inst_word(instr)));
+		instr = PPC_INST_PREFIXED(swab32(ppc_inst_word(instr)),
+					  swab32(ppc_inst_suffix(instr)));
 	}
 
 #ifdef CONFIG_SPE

@@ -25,11 +25,11 @@
 bool is_offset_in_branch_range(long offset);
 ppc_inst create_branch(const ppc_inst *addr,
 			   unsigned long target, int flags);
-unsigned int create_cond_branch(const ppc_inst *addr,
+ppc_inst create_cond_branch(const void *addr,
 				unsigned long target, int flags);
-int patch_branch(ppc_inst *addr, unsigned long target, int flags);
-int patch_instruction(ppc_inst *addr, ppc_inst instr);
-int raw_patch_instruction(ppc_inst *addr, ppc_inst instr);
+int patch_branch(void *addr, unsigned long target, int flags);
+int patch_instruction(void *addr, ppc_inst instr);
+int raw_patch_instruction(void *addr, ppc_inst instr);
 
 static inline unsigned long patch_site_addr(s32 *site)
 {
@@ -60,7 +60,7 @@ static inline int modify_instruction_site(s32 *site, unsigned int clr, unsigned 
 int instr_is_relative_branch(ppc_inst instr);
 int instr_is_relative_link_branch(ppc_inst instr);
 int instr_is_branch_to_addr(const ppc_inst *instr, unsigned long addr);
-unsigned long branch_target(const ppc_inst *instr);
+unsigned long branch_target(const void *instr);
 ppc_inst translate_branch(const ppc_inst *dest,
 			      const ppc_inst *src);
 extern bool is_conditional_branch(ppc_inst instr);

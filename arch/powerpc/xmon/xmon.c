@@ -110,7 +110,7 @@ struct bpt {
 #define BP_DABR		4
 
 #define NBPTS	256
-#define BPT_WORDS	2
+#define BPT_WORDS	4
 static struct bpt bpts[NBPTS];
 static struct bpt dabr;
 static struct bpt *iabr;
@@ -118,12 +118,13 @@ static unsigned bpinstr = 0x7fe00008;	/* trap */
 
 #define BP_NUM(bp)	((bp) - bpts + 1)
 
-static unsigned int __section(.text.xmon_bpts) bpt_table[NBPTS * BPT_WORDS];
+static unsigned int __section(.text.xmon_bpts) bpt_table[NBPTS * BPT_WORDS] __aligned(64);
 
 /* Prototypes */
 static int cmds(struct pt_regs *);
 static int mread(unsigned long, void *, int);
 static int mwrite(unsigned long, void *, int);
+static int mread_instr(unsigned long, ppc_inst *);
 static int handle_fault(struct pt_regs *);
 static void byterev(unsigned char *, int);
 static void memex(void);
@@ -759,8 +760,8 @@ static int xmon_bpt(struct pt_regs *regs)
 
 	/* Are we at the trap at bp->instr[1] for some bp? */
 	bp = in_breakpoint_table(regs->nip, &offset);
-	if (bp != NULL && offset == 4) {
-		regs->nip = bp->address + 4;
+	if (bp != NULL && (offset == 4 || offset == 8)) {
+		regs->nip = bp->address + offset;
 		atomic_dec(&bp->ref_count);
 		return 1;
 	}
@@ -862,7 +863,7 @@ static struct bpt *in_breakpoint_table(unsigned long nip, unsigned long *offp)
 	if (off >= sizeof(bpt_table))
 		return NULL;
 	bp_off = off % (sizeof(unsigned int) * BPT_WORDS);
-	if (bp_off != 0 && bp_off != 4)
+	if (bp_off != 0 && bp_off != 4 && bp_off != 8)
 		return NULL;
 	*offp = bp_off;
 	return bpts + ((off - bp_off) / (sizeof(unsigned int) * BPT_WORDS));
@@ -881,7 +882,6 @@ static struct bpt *new_breakpoint(unsigned long a)
 		if (!bp->enabled && atomic_read(&bp->ref_count) == 0) {
 			bp->address = a;
 			bp->instr = bpt_table + ((bp - bpts) * BPT_WORDS);
-			patch_instruction(bp->instr + 1, PPC_INST(bpinstr));
 			return bp;
 		}
 	}
@@ -900,7 +900,7 @@ static void insert_bpts(void)
 	for (i = 0; i < NBPTS; ++i, ++bp) {
 		if ((bp->enabled & (BP_TRAP|BP_CIABR)) == 0)
 			continue;
-		if (mread(bp->address, &instr, 4) != 4) {
+		if (!mread_instr(bp->address, &instr)) {
 			printf("Couldn't read instruction at %lx, "
 			       "disabling breakpoint there\n", bp->address);
 			bp->enabled = 0;
@@ -913,9 +913,10 @@ static void insert_bpts(void)
 			continue;
 		}
 		patch_instruction(bp->instr, instr);
+		patch_instruction(bp->instr + ppc_inst_len(instr), PPC_INST(bpinstr));
 		if (bp->enabled & BP_CIABR)
 			continue;
-		if (patch_instruction((ppc_inst *)bp->address,
+		if (patch_instruction((void *)bp->address,
 							PPC_INST(bpinstr)) != 0) {
 			printf("Couldn't write instruction at %lx, "
 			       "disabling breakpoint there\n", bp->address);
@@ -950,7 +951,7 @@ static void remove_bpts(void)
 	for (i = 0; i < NBPTS; ++i, ++bp) {
 		if ((bp->enabled & (BP_TRAP|BP_CIABR)) != BP_TRAP)
 			continue;
-		if (mread(bp->address, &instr, 4) == 4
+		if (mread_instr(bp->address, &instr)
 		    && ppc_inst_equal(instr, PPC_INST(bpinstr))
 		    && patch_instruction(
 			(ppc_inst *)bp->address, ppc_inst_read(bp->instr)) != 0)
@@ -1166,7 +1167,7 @@ static int do_step(struct pt_regs *regs)
 	force_enable_xmon();
 	/* check we are in 64-bit kernel mode, translation enabled */
 	if ((regs->msr & (MSR_64BIT|MSR_PR|MSR_IR)) == (MSR_64BIT|MSR_IR)) {
-		if (mread(regs->nip, &instr, 4) == 4) {
+		if (mread_instr(regs->nip, &instr)) {
 			stepped = emulate_step(regs, instr);
 			if (stepped < 0) {
 				printf("Couldn't single-step %s instruction\n",
@@ -1333,7 +1334,7 @@ static long check_bp_loc(unsigned long addr)
 		printf("Breakpoints may only be placed at kernel addresses\n");
 		return 0;
 	}
-	if (!mread(addr, &instr, sizeof(instr))) {
+	if (!mread_instr(addr, &instr)) {
 		printf("Can't read instruction at address %lx\n", addr);
 		return 0;
 	}
@@ -2124,6 +2125,21 @@ mwrite(unsigned long adrs, void *buf, int size)
 	}
 	catch_memory_errors = 0;
 	return n;
+}
+
+static int
+mread_instr(unsigned long adrs, ppc_inst *instr)
+{
+	if (setjmp(bus_error_jmp) == 0) {
+		catch_memory_errors = 1;
+		sync();
+		*instr = ppc_inst_read((void *)adrs);
+		sync();
+		/* wait a little while to see if we get a machine check */
+		__delay(200);
+	}
+	catch_memory_errors = 0;
+	return ppc_inst_len(*instr);
 }
 
 static int fault_type;

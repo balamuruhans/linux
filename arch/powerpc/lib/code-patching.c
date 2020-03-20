@@ -24,17 +24,27 @@ static int __patch_instruction(ppc_inst *exec_addr, ppc_inst instr,
 {
 	int err = 0;
 
-	__put_user_asm(instr, patch_addr, err, "stw");
+	__put_user_asm(ppc_inst_word(instr), patch_addr, err, "stw");
 	if (err)
 		return err;
 
 	asm ("dcbst 0, %0; sync; icbi 0,%1; sync; isync" :: "r" (patch_addr),
 							    "r" (exec_addr));
 
+	if (!ppc_inst_prefixed(instr))
+		return 0;
+
+	__put_user_asm(ppc_inst_suffix(instr), patch_addr + 4, err, "stw");
+	if (err)
+		return err;
+
+	asm ("dcbst 0, %0; sync; icbi 0,%1; sync; isync" :: "r" (patch_addr + 4),
+							    "r" (exec_addr + 4));
+
 	return 0;
 }
 
-int raw_patch_instruction(ppc_inst *addr, ppc_inst instr)
+int raw_patch_instruction(void *addr, ppc_inst instr)
 {
 	return __patch_instruction(addr, instr, addr);
 }
@@ -184,7 +194,7 @@ static int do_patch_instruction(ppc_inst *addr, ppc_inst instr)
 
 #endif /* CONFIG_STRICT_KERNEL_RWX */
 
-int patch_instruction(unsigned int *addr, unsigned int instr)
+int patch_instruction(void *addr, ppc_inst instr)
 {
 	/* Make sure we aren't patching a freed init section */
 	if (init_mem_is_free && init_section_contains(addr, 4)) {
@@ -195,7 +205,7 @@ int patch_instruction(unsigned int *addr, unsigned int instr)
 }
 NOKPROBE_SYMBOL(patch_instruction);
 
-int patch_branch(ppc_inst *addr, unsigned long target, int flags)
+int patch_branch(void *addr, unsigned long target, int flags)
 {
 	return patch_instruction(addr, create_branch(addr, target, flags));
 }
@@ -264,7 +274,7 @@ ppc_inst create_branch(const ppc_inst *addr,
 	return instruction;
 }
 
-unsigned int create_cond_branch(const unsigned int *addr,
+ppc_inst create_cond_branch(const void *addr,
 				unsigned long target, int flags)
 {
 	ppc_inst instruction;
@@ -344,7 +354,7 @@ static unsigned long branch_bform_target(const ppc_inst *instr)
 	return (unsigned long)imm;
 }
 
-unsigned long branch_target(const ppc_inst *instr)
+unsigned long branch_target(const void *instr)
 {
 	if (instr_is_branch_iform(ppc_inst_read(instr)))
 		return branch_iform_target(instr);

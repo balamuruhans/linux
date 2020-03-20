@@ -153,7 +153,7 @@ NOKPROBE_SYMBOL(arch_arm_kprobe);
 
 void arch_disarm_kprobe(struct kprobe *p)
 {
-	patch_instruction(p->addr, PPC_INST(p->opcode));
+	patch_instruction(p->addr, ppc_inst_read(p->ainsn.insn));
 }
 NOKPROBE_SYMBOL(arch_disarm_kprobe);
 
@@ -487,12 +487,13 @@ int kprobe_post_handler(struct pt_regs *regs)
 {
 	struct kprobe *cur = kprobe_running();
 	struct kprobe_ctlblk *kcb = get_kprobe_ctlblk();
+	int len = ppc_inst_len(ppc_inst_read(cur->ainsn.insn));
 
 	if (!cur || user_mode(regs))
 		return 0;
 
 	/* make sure we got here for instruction we have a kprobe on */
-	if (((unsigned long)cur->ainsn.insn + 4) != regs->nip)
+	if ((unsigned long)cur->ainsn.insn + len != regs->nip)
 		return 0;
 
 	if ((kcb->kprobe_status != KPROBE_REENTER) && cur->post_handler) {
@@ -501,7 +502,7 @@ int kprobe_post_handler(struct pt_regs *regs)
 	}
 
 	/* Adjust nip to after the single-stepped instruction */
-	regs->nip = (unsigned long)cur->addr + 4;
+	regs->nip = (unsigned long)cur->addr + len;
 	regs->msr |= kcb->kprobe_saved_msr;
 
 	/*Restore back the original saved kprobes variables and continue. */
