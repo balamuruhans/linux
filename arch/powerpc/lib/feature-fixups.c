@@ -49,8 +49,8 @@ static int patch_alt_instruction(unsigned int *src, unsigned int *dest,
 
 	instr = *src;
 
-	if (instr_is_relative_branch(*src)) {
-		unsigned int *target = (unsigned int *)branch_target(src);
+	if (instr_is_relative_branch(PPC_INST(*src))) {
+		unsigned int *target = (unsigned int *)branch_target((ppc_inst *)src);
 
 		/* Branch within the section doesn't need translating */
 		if (target < alt_start || target > alt_end) {
@@ -60,7 +60,7 @@ static int patch_alt_instruction(unsigned int *src, unsigned int *dest,
 		}
 	}
 
-	raw_patch_instruction(dest, instr);
+	raw_patch_instruction((ppc_inst *)dest, PPC_INST(instr));
 
 	return 0;
 }

@@ -117,7 +117,7 @@ void *alloc_insn_page(void)
 int arch_prepare_kprobe(struct kprobe *p)
 {
 	int ret = 0;
-	kprobe_opcode_t insn = *p->addr;
+	ppc_inst insn = ppc_inst_read(p->addr);
 
 	if ((unsigned long)p->addr & 0x03) {
 		printk("Attempt to register kprobe at an unaligned address\n");
@@ -136,8 +136,8 @@ int arch_prepare_kprobe(struct kprobe *p)
 	}
 
 	if (!ret) {
-		patch_instruction(p->ainsn.insn, *p->addr);
-		p->opcode = *p->addr;
+		patch_instruction(p->ainsn.insn, insn);
+		p->opcode = ppc_inst_word(insn);
 	}
 
 	p->ainsn.boostable = 0;
@@ -225,7 +225,7 @@ NOKPROBE_SYMBOL(arch_prepare_kretprobe);
 static int try_to_emulate(struct kprobe *p, struct pt_regs *regs)
 {
 	int ret;
-	ppc_inst insn = *p->ainsn.insn;
+	ppc_inst insn = ppc_inst_read((ppc_inst *)p->ainsn.insn);
 
 	/* regs->nip is also adjusted if emulate_step returns 1 */
 	ret = emulate_step(regs, insn);

@@ -346,9 +346,9 @@ static unsigned long branch_bform_target(const ppc_inst *instr)
 
 unsigned long branch_target(const ppc_inst *instr)
 {
-	if (instr_is_branch_iform(*instr))
+	if (instr_is_branch_iform(ppc_inst_read(instr)))
 		return branch_iform_target(instr);
-	else if (instr_is_branch_bform(*instr))
+	else if (instr_is_branch_bform(ppc_inst_read(instr)))
 		return branch_bform_target(instr);
 
 	return 0;
@@ -356,7 +356,7 @@ unsigned long branch_target(const ppc_inst *instr)
 
 int instr_is_branch_to_addr(const ppc_inst *instr, unsigned long addr)
 {
-	if (instr_is_branch_iform(*instr) || instr_is_branch_bform(*instr))
+	if (instr_is_branch_iform(ppc_inst_read(instr)) || instr_is_branch_bform(ppc_inst_read(instr)))
 		return branch_target(instr) == addr;
 
 	return 0;
@@ -368,10 +368,10 @@ ppc_inst translate_branch(const ppc_inst *dest, const ppc_inst *src)
 
 	target = branch_target(src);
 
-	if (instr_is_branch_iform(*src))
-		return create_branch(dest, target, *src);
-	else if (instr_is_branch_bform(*src))
-		return create_cond_branch(dest, target, *src);
+	if (instr_is_branch_iform(ppc_inst_read(src)))
+		return create_branch(dest, target, ppc_inst_word(ppc_inst_read(src)));
+	else if (instr_is_branch_bform(ppc_inst_read(src)))
+		return create_cond_branch(dest, target, ppc_inst_word(ppc_inst_read(src)));
 
 	return PPC_INST(0);
 }
@@ -588,7 +588,7 @@ static void __init test_translate_branch(void)
 	patch_instruction(q, translate_branch(q, p));
 	check(instr_is_branch_to_addr(p, addr));
 	check(instr_is_branch_to_addr(q, addr));
-	check(*q == PPC_INST(0x4a000000));
+	check(ppc_inst_equal(ppc_inst_read(q), PPC_INST(0x4a000000)));
 
 	/* Maximum positive case, move x to x - 32 MB + 4 */
 	p = buf + 0x2000000;
@@ -598,7 +598,7 @@ static void __init test_translate_branch(void)
 	patch_instruction(q, translate_branch(q, p));
 	check(instr_is_branch_to_addr(p, addr));
 	check(instr_is_branch_to_addr(q, addr));
-	check(*q == PPC_INST(0x49fffffc));
+	check(ppc_inst_equal(ppc_inst_read(q), PPC_INST(0x49fffffc)));
 
 	/* Jump to x + 16 MB moved to x + 20 MB */
 	p = buf;
@@ -638,7 +638,7 @@ static void __init test_translate_branch(void)
 	patch_instruction(q, translate_branch(q, p));
 	check(instr_is_branch_to_addr(p, addr));
 	check(instr_is_branch_to_addr(q, addr));
-	check(*q == PPC_INST(0x43ff8000));
+	check(ppc_inst_equal(ppc_inst_read(q), PPC_INST(0x43ff8000)));
 
 	/* Maximum positive case, move x to x - 32 KB + 4 */
 	p = buf + 0x8000;
@@ -648,7 +648,7 @@ static void __init test_translate_branch(void)
 	patch_instruction(q, translate_branch(q, p));
 	check(instr_is_branch_to_addr(p, addr));
 	check(instr_is_branch_to_addr(q, addr));
-	check(*q == PPC_INST(0x43ff7ffc));
+	check(ppc_inst_equal(ppc_inst_read(q), PPC_INST(0x43ff7ffc)));
 
 	/* Jump to x + 12 KB moved to x + 20 KB */
 	p = buf;

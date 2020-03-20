@@ -99,8 +99,8 @@ static unsigned long can_optimize(struct kprobe *p)
 	 * Ensure that the instruction is not a conditional branch,
 	 * and that can be emulated.
 	 */
-	if (!is_conditional_branch(*p->ainsn.insn) &&
-			analyse_instr(&op, &regs, *p->ainsn.insn) == 1) {
+	if (!is_conditional_branch(ppc_inst_read(p->ainsn.insn)) &&
+			analyse_instr(&op, &regs, ppc_inst_read(p->ainsn.insn)) == 1) {
 		emulate_update_regs(&regs, &op);
 		nip = regs.nip;
 	}
@@ -268,7 +268,7 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op, struct kprobe *p)
 	/*
 	 * 3. load instruction to be emulated into relevant register, and
 	 */
-	patch_imm32_load_insns(*p->ainsn.insn, buff + TMPL_INSN_IDX);
+	patch_imm32_load_insns(*(unsigned int *)p->ainsn.insn, buff + TMPL_INSN_IDX);
 
 	/*
 	 * 4. branch back from trampoline
