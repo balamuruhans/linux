@@ -17,9 +17,10 @@
 #include <asm/page.h>
 #include <asm/code-patching.h>
 #include <asm/setup.h>
+#include <asm/inst.h>
 
-static int __patch_instruction(unsigned int *exec_addr, unsigned int instr,
-			       unsigned int *patch_addr)
+static int __patch_instruction(ppc_inst *exec_addr, ppc_inst instr,
+			       ppc_inst *patch_addr)
 {
 	int err = 0;
 
@@ -33,7 +34,7 @@ static int __patch_instruction(unsigned int *exec_addr, unsigned int instr,
 	return 0;
 }
 
-int raw_patch_instruction(unsigned int *addr, unsigned int instr)
+int raw_patch_instruction(ppc_inst *addr, ppc_inst instr)
 {
 	return __patch_instruction(addr, instr, addr);
 }
@@ -136,10 +137,10 @@ static inline int unmap_patch_area(unsigned long addr)
 	return 0;
 }
 
-static int do_patch_instruction(unsigned int *addr, unsigned int instr)
+static int do_patch_instruction(ppc_inst *addr, ppc_inst instr)
 {
 	int err;
-	unsigned int *patch_addr = NULL;
+	ppc_inst *patch_addr = NULL;
 	unsigned long flags;
 	unsigned long text_poke_addr;
 	unsigned long kaddr = (unsigned long)addr;
@@ -176,7 +177,7 @@ out:
 }
 #else /* !CONFIG_STRICT_KERNEL_RWX */
 
-static int do_patch_instruction(unsigned int *addr, unsigned int instr)
+static int do_patch_instruction(ppc_inst *addr, ppc_inst instr)
 {
 	return raw_patch_instruction(addr, instr);
 }
@@ -194,7 +195,7 @@ int patch_instruction(unsigned int *addr, unsigned int instr)
 }
 NOKPROBE_SYMBOL(patch_instruction);
 
-int patch_branch(unsigned int *addr, unsigned long target, int flags)
+int patch_branch(ppc_inst *addr, unsigned long target, int flags)
 {
 	return patch_instruction(addr, create_branch(addr, target, flags));
 }
@@ -225,7 +226,7 @@ bool is_offset_in_branch_range(long offset)
  * Helper to check if a given instruction is a conditional branch
  * Derived from the conditional checks in analyse_instr()
  */
-bool is_conditional_branch(unsigned int instr)
+bool is_conditional_branch(ppc_inst instr)
 {
 	unsigned int opcode = instr >> 26;
 
@@ -243,10 +244,10 @@ bool is_conditional_branch(unsigned int instr)
 }
 NOKPROBE_SYMBOL(is_conditional_branch);
 
-unsigned int create_branch(const unsigned int *addr,
+ppc_inst create_branch(const ppc_inst *addr,
 			   unsigned long target, int flags)
 {
-	unsigned int instruction;
+	ppc_inst instruction;
 	long offset;
 
 	offset = target;
@@ -266,7 +267,7 @@ unsigned int create_branch(const unsigned int *addr,
 unsigned int create_cond_branch(const unsigned int *addr,
 				unsigned long target, int flags)
 {
-	unsigned int instruction;
+	ppc_inst instruction;
 	long offset;
 
 	offset = target;
@@ -283,22 +284,22 @@ unsigned int create_cond_branch(const unsigned int *addr,
 	return instruction;
 }
 
-static unsigned int branch_opcode(unsigned int instr)
+static unsigned int branch_opcode(ppc_inst instr)
 {
 	return (instr >> 26) & 0x3F;
 }
 
-static int instr_is_branch_iform(unsigned int instr)
+static int instr_is_branch_iform(ppc_inst instr)
 {
 	return branch_opcode(instr) == 18;
 }
 
-static int instr_is_branch_bform(unsigned int instr)
+static int instr_is_branch_bform(ppc_inst instr)
 {
 	return branch_opcode(instr) == 16;
 }
 
-int instr_is_relative_branch(unsigned int instr)
+int instr_is_relative_branch(ppc_inst instr)
 {
 	if (instr & BRANCH_ABSOLUTE)
 		return 0;
@@ -306,12 +307,12 @@ int instr_is_relative_branch(unsigned int instr)
 	return instr_is_branch_iform(instr) || instr_is_branch_bform(instr);
 }
 
-int instr_is_relative_link_branch(unsigned int instr)
+int instr_is_relative_link_branch(ppc_inst instr)
 {
 	return instr_is_relative_branch(instr) && (instr & BRANCH_SET_LINK);
 }
 
-static unsigned long branch_iform_target(const unsigned int *instr)
+static unsigned long branch_iform_target(const ppc_inst *instr)
 {
 	signed long imm;
 
@@ -327,7 +328,7 @@ static unsigned long branch_iform_target(const unsigned int *instr)
 	return (unsigned long)imm;
 }
 
-static unsigned long branch_bform_target(const unsigned int *instr)
+static unsigned long branch_bform_target(const ppc_inst *instr)
 {
 	signed long imm;
 
@@ -343,7 +344,7 @@ static unsigned long branch_bform_target(const unsigned int *instr)
 	return (unsigned long)imm;
 }
 
-unsigned long branch_target(const unsigned int *instr)
+unsigned long branch_target(const ppc_inst *instr)
 {
 	if (instr_is_branch_iform(*instr))
 		return branch_iform_target(instr);
@@ -353,7 +354,7 @@ unsigned long branch_target(const unsigned int *instr)
 	return 0;
 }
 
-int instr_is_branch_to_addr(const unsigned int *instr, unsigned long addr)
+int instr_is_branch_to_addr(const ppc_inst *instr, unsigned long addr)
 {
 	if (instr_is_branch_iform(*instr) || instr_is_branch_bform(*instr))
 		return branch_target(instr) == addr;
@@ -361,7 +362,7 @@ int instr_is_branch_to_addr(const unsigned int *instr, unsigned long addr)
 	return 0;
 }
 
-unsigned int translate_branch(const unsigned int *dest, const unsigned int *src)
+ppc_inst translate_branch(const ppc_inst *dest, const ppc_inst *src)
 {
 	unsigned long target;
 
@@ -403,7 +404,7 @@ static void __init test_trampoline(void)
 
 static void __init test_branch_iform(void)
 {
-	unsigned int instr;
+	ppc_inst instr;
 	unsigned long addr;
 
 	addr = (unsigned long)&instr;
@@ -478,11 +479,11 @@ static void __init test_branch_iform(void)
 
 static void __init test_create_function_call(void)
 {
-	unsigned int *iptr;
+	ppc_inst *iptr;
 	unsigned long dest;
 
 	/* Check we can create a function call */
-	iptr = (unsigned int *)ppc_function_entry(test_trampoline);
+	iptr = (ppc_inst *)ppc_function_entry(test_trampoline);
 	dest = ppc_function_entry(test_create_function_call);
 	patch_instruction(iptr, create_branch(iptr, dest, BRANCH_SET_LINK));
 	check(instr_is_branch_to_addr(iptr, dest));
@@ -491,7 +492,8 @@ static void __init test_create_function_call(void)
 static void __init test_branch_bform(void)
 {
 	unsigned long addr;
-	unsigned int *iptr, instr, flags;
+	ppc_inst *iptr, instr;
+	unsigned int flags;
 
 	iptr = &instr;
 	addr = (unsigned long)iptr;
@@ -561,7 +563,7 @@ static void __init test_branch_bform(void)
 static void __init test_translate_branch(void)
 {
 	unsigned long addr;
-	unsigned int *p, *q;
+	ppc_inst *p, *q;
 	void *buf;
 
 	buf = vmalloc(PAGE_ALIGN(0x2000000 + 1));

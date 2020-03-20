@@ -21,6 +21,7 @@
 #include <asm/disassemble.h>
 #include <asm/ppc-opcode.h>
 #include <asm/sstep.h>
+#include <asm/inst.h>
 #include "timing.h"
 #include "trace.h"
 

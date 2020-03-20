@@ -189,8 +189,8 @@ void patch_imm64_load_insns(unsigned long val, kprobe_opcode_t *addr)
 
 int arch_prepare_optimized_kprobe(struct optimized_kprobe *op, struct kprobe *p)
 {
-	kprobe_opcode_t *buff, branch_op_callback, branch_emulate_step;
-	kprobe_opcode_t *op_callback_addr, *emulate_step_addr;
+	ppc_inst branch_op_callback, branch_emulate_step;
+	kprobe_opcode_t *op_callback_addr, *emulate_step_addr, *buff;
 	long b_offset;
 	unsigned long nip, size;
 	int rc, i;
@@ -251,11 +251,11 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op, struct kprobe *p)
 		goto error;
 	}
 
-	branch_op_callback = create_branch((unsigned int *)buff + TMPL_CALL_HDLR_IDX,
+	branch_op_callback = create_branch((ppc_inst *)buff + TMPL_CALL_HDLR_IDX,
 				(unsigned long)op_callback_addr,
 				BRANCH_SET_LINK);
 
-	branch_emulate_step = create_branch((unsigned int *)buff + TMPL_EMULATE_IDX,
+	branch_emulate_step = create_branch((ppc_inst *)buff + TMPL_EMULATE_IDX,
 				(unsigned long)emulate_step_addr,
 				BRANCH_SET_LINK);
 
@@ -316,7 +316,7 @@ void arch_optimize_kprobes(struct list_head *oplist)
 		memcpy(op->optinsn.copied_insn, op->kp.addr,
 					       RELATIVEJUMP_SIZE);
 		patch_instruction(op->kp.addr,
-			create_branch((unsigned int *)op->kp.addr,
+			create_branch((ppc_inst *)op->kp.addr,
 				      (unsigned long)op->optinsn.insn, 0));
 		list_del_init(&op->list);
 	}

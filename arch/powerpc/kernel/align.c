@@ -293,7 +293,7 @@ static int emulate_spe(struct pt_regs *regs, unsigned int reg,
 
 int fix_alignment(struct pt_regs *regs)
 {
-	unsigned int instr;
+	ppc_inst instr;
 	struct instruction_op op;
 	int r, type;
 

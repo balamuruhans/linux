@@ -892,7 +892,7 @@ static struct bpt *new_breakpoint(unsigned long a)
 static void insert_bpts(void)
 {
 	int i;
-	unsigned int instr;
+	ppc_inst instr;
 	struct bpt *bp;
 
 	bp = bpts;
@@ -914,7 +914,7 @@ static void insert_bpts(void)
 		patch_instruction(bp->instr, instr);
 		if (bp->enabled & BP_CIABR)
 			continue;
-		if (patch_instruction((unsigned int *)bp->address,
+		if (patch_instruction((ppc_inst *)bp->address,
 							bpinstr) != 0) {
 			printf("Couldn't write instruction at %lx, "
 			       "disabling breakpoint there\n", bp->address);
@@ -943,7 +943,7 @@ static void remove_bpts(void)
 {
 	int i;
 	struct bpt *bp;
-	unsigned instr;
+	ppc_inst instr;
 
 	bp = bpts;
 	for (i = 0; i < NBPTS; ++i, ++bp) {
@@ -952,7 +952,7 @@ static void remove_bpts(void)
 		if (mread(bp->address, &instr, 4) == 4
 		    && instr == bpinstr
 		    && patch_instruction(
-			(unsigned int *)bp->address, bp->instr[0]) != 0)
+			(ppc_inst *)bp->address, bp->instr[0]) != 0)
 			printf("Couldn't remove breakpoint at %lx\n",
 			       bp->address);
 	}
@@ -1159,7 +1159,7 @@ static int do_step(struct pt_regs *regs)
  */
 static int do_step(struct pt_regs *regs)
 {
-	unsigned int instr;
+	ppc_inst instr;
 	int stepped;
 
 	force_enable_xmon();
@@ -1325,7 +1325,7 @@ csum(void)
  */
 static long check_bp_loc(unsigned long addr)
 {
-	unsigned int instr;
+	ppc_inst instr;
 
 	addr &= ~3;
 	if (!is_kernel_addr(addr)) {
