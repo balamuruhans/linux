@@ -244,7 +244,7 @@ dar_range_overlaps(unsigned long dar, int size, struct arch_hw_breakpoint *info)
 static bool stepping_handler(struct pt_regs *regs, struct perf_event *bp,
 			     struct arch_hw_breakpoint *info)
 {
-	ppc_inst instr = 0;
+	ppc_inst instr = PPC_INST(0);
 	int ret, type, size;
 	struct instruction_op op;
 	unsigned long addr = info->address;

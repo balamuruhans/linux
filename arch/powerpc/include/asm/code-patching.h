@@ -49,7 +49,7 @@ static inline int patch_branch_site(s32 *site, unsigned long target, int flags)
 static inline int modify_instruction(unsigned int *addr, unsigned int clr,
 				     unsigned int set)
 {
-	return patch_instruction(addr, (*addr & ~clr) | set);
+	return patch_instruction(addr, PPC_INST((*addr & ~clr) | set));
 }
 
 static inline int modify_instruction_site(s32 *site, unsigned int clr, unsigned int set)

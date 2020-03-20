@@ -161,7 +161,7 @@ __ftrace_make_nop(struct module *mod,
 
 #ifdef CONFIG_MPROFILE_KERNEL
 	/* When using -mkernel_profile there is no load to jump over */
-	pop = PPC_INST_NOP;
+	pop = PPC_INST(PPC_INST_NOP);
 
 	if (probe_kernel_read(&op, (void *)(ip - 4), 4)) {
 		pr_err("Fetching instruction at %lx failed.\n", ip - 4);
@@ -169,7 +169,7 @@ __ftrace_make_nop(struct module *mod,
 	}
 
 	/* We expect either a mflr r0, or a std r0, LRSAVE(r1) */
-	if (op != PPC_INST_MFLR && op != PPC_INST_STD_LR) {
+	if (op != PPC_INST(PPC_INST_MFLR) && op != PPC_INST(PPC_INST_STD_LR)) {
 		pr_err("Unexpected instruction %08x around bl _mcount\n", op);
 		return -EINVAL;
 	}
@@ -188,7 +188,7 @@ __ftrace_make_nop(struct module *mod,
 	 * Use a b +8 to jump over the load.
 	 */
 
-	pop = PPC_INST_BRANCH | 8;	/* b +8 */
+	pop = PPC_INST(PPC_INST_BRANCH | 8);	/* b +8 */
 
 	/*
 	 * Check what is in the next instruction. We can see ld r2,40(r1), but
@@ -199,7 +199,7 @@ __ftrace_make_nop(struct module *mod,
 		return -EFAULT;
 	}
 
-	if (op != PPC_INST_LD_TOC) {
+	if (op != PPC_INST(PPC_INST_LD_TOC)) {
 		pr_err("Expected %08x found %08x\n", PPC_INST_LD_TOC, op);
 		return -EINVAL;
 	}
@@ -275,7 +275,7 @@ __ftrace_make_nop(struct module *mod,
 		return -EINVAL;
 	}
 
-	op = PPC_INST_NOP;
+	op = PPC_INST(PPC_INST_NOP);
 
 	if (patch_instruction((ppc_inst *)ip, op))
 		return -EPERM;
@@ -418,7 +418,7 @@ static int __ftrace_make_nop_kernel(struct dyn_ftrace *rec, unsigned long addr)
 		}
 	}
 
-	if (patch_instruction((ppc_inst *)ip, PPC_INST_NOP)) {
+	if (patch_instruction((ppc_inst *)ip, PPC_INST(PPC_INST_NOP))) {
 		pr_err("Patching NOP failed.\n");
 		return -EPERM;
 	}
@@ -440,7 +440,7 @@ int ftrace_make_nop(struct module *mod,
 	if (test_24bit_addr(ip, addr)) {
 		/* within range */
 		old = ftrace_call_replace(ip, addr, 1);
-		new = PPC_INST_NOP;
+		new = PPC_INST(PPC_INST_NOP);
 		return ftrace_modify_code(ip, old, new);
 	} else if (core_kernel_text(ip))
 		return __ftrace_make_nop_kernel(rec, addr);
@@ -500,10 +500,10 @@ expected_nop_sequence(void *ip, ppc_inst op0, ppc_inst op1)
 }
 #else
 static int
-expected_nop_sequence(void *ip, unsigned int op0, unsigned int op1)
+expected_nop_sequence(void *ip, ppc_inst op0, ppc_inst op1)
 {
 	/* look for patched "NOP" on ppc64 with -mprofile-kernel */
-	if (op0 != PPC_INST_NOP)
+	if (op0 != PPC_INST(PPC_INST_NOP))
 		return 0;
 	return 1;
 }
@@ -584,7 +584,7 @@ __ftrace_make_call(struct dyn_ftrace *rec, unsigned long addr)
 		return -EFAULT;
 
 	/* It should be pointing to a nop */
-	if (op != PPC_INST_NOP) {
+	if (op != PPC_INST(PPC_INST_NOP)) {
 		pr_err("Expected NOP but have %x\n", op);
 		return -EINVAL;
 	}
@@ -641,7 +641,7 @@ static int __ftrace_make_call_kernel(struct dyn_ftrace *rec, unsigned long addr)
 		return -EFAULT;
 	}
 
-	if (op != PPC_INST_NOP) {
+	if (op != PPC_INST(PPC_INST_NOP)) {
 		pr_err("Unexpected call sequence at %p: %x\n", ip, op);
 		return -EINVAL;
 	}
@@ -672,7 +672,7 @@ int ftrace_make_call(struct dyn_ftrace *rec, unsigned long addr)
 	 */
 	if (test_24bit_addr(ip, addr)) {
 		/* within range */
-		old = PPC_INST_NOP;
+		old = PPC_INST(PPC_INST_NOP);
 		new = ftrace_call_replace(ip, addr, 1);
 		return ftrace_modify_code(ip, old, new);
 	} else if (core_kernel_text(ip))

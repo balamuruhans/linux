@@ -54,6 +54,7 @@
 #include <asm/firmware.h>
 #include <asm/code-patching.h>
 #include <asm/sections.h>
+#include <asm/inst.h>
 
 #ifdef CONFIG_PPC64
 #include <asm/hvcall.h>
@@ -880,7 +881,7 @@ static struct bpt *new_breakpoint(unsigned long a)
 		if (!bp->enabled && atomic_read(&bp->ref_count) == 0) {
 			bp->address = a;
 			bp->instr = bpt_table + ((bp - bpts) * BPT_WORDS);
-			patch_instruction(bp->instr + 1, bpinstr);
+			patch_instruction(bp->instr + 1, PPC_INST(bpinstr));
 			return bp;
 		}
 	}
@@ -915,7 +916,7 @@ static void insert_bpts(void)
 		if (bp->enabled & BP_CIABR)
 			continue;
 		if (patch_instruction((ppc_inst *)bp->address,
-							bpinstr) != 0) {
+							PPC_INST(bpinstr)) != 0) {
 			printf("Couldn't write instruction at %lx, "
 			       "disabling breakpoint there\n", bp->address);
 			bp->enabled &= ~BP_TRAP;
@@ -950,7 +951,7 @@ static void remove_bpts(void)
 		if ((bp->enabled & (BP_TRAP|BP_CIABR)) != BP_TRAP)
 			continue;
 		if (mread(bp->address, &instr, 4) == 4
-		    && instr == bpinstr
+		    && instr == PPC_INST(bpinstr)
 		    && patch_instruction(
 			(ppc_inst *)bp->address, bp->instr[0]) != 0)
 			printf("Couldn't remove breakpoint at %lx\n",
@@ -2846,7 +2847,7 @@ generic_inst_dump(unsigned long adr, long count, int praddr,
 {
 	int nr, dotted;
 	unsigned long first_adr;
-	unsigned int inst, last_inst = 0;
+	ppc_inst inst, last_inst = PPC_INST(0);
 	unsigned char val[4];
 
 	dotted = 0;
@@ -2859,7 +2860,7 @@ generic_inst_dump(unsigned long adr, long count, int praddr,
 			}
 			break;
 		}
-		inst = GETWORD(val);
+		inst = PPC_INST(GETWORD(val));
 		if (adr > first_adr && inst == last_inst) {
 			if (!dotted) {
 				printf(" ...\n");

@@ -506,7 +506,7 @@ static int restore_r2(const char *name, u32 *instruction, struct module *me)
 	 * "link" branches and they don't return, so they don't need the r2
 	 * restore afterwards.
 	 */
-	if (!instr_is_relative_link_branch(*prev_insn))
+	if (!instr_is_relative_link_branch(PPC_INST(*prev_insn)))
 		return 1;
 
 	if (*instruction != PPC_INST_NOP) {
