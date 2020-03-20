@@ -97,7 +97,7 @@ static long *xmon_fault_jmp[NR_CPUS];
 /* Breakpoint stuff */
 struct bpt {
 	unsigned long	address;
-	unsigned int	instr[2];
+	unsigned int	*instr;
 	atomic_t	ref_count;
 	int		enabled;
 	unsigned long	pad;
@@ -109,12 +109,15 @@ struct bpt {
 #define BP_DABR		4
 
 #define NBPTS	256
+#define BPT_WORDS	2
 static struct bpt bpts[NBPTS];
 static struct bpt dabr;
 static struct bpt *iabr;
 static unsigned bpinstr = 0x7fe00008;	/* trap */
 
 #define BP_NUM(bp)	((bp) - bpts + 1)
+
+static unsigned int __section(.text.xmon_bpts) bpt_table[NBPTS * BPT_WORDS];
 
 /* Prototypes */
 static int cmds(struct pt_regs *);
@@ -852,16 +855,16 @@ static struct bpt *at_breakpoint(unsigned long pc)
 static struct bpt *in_breakpoint_table(unsigned long nip, unsigned long *offp)
 {
 	unsigned long off;
+	unsigned long bp_off;
 
-	off = nip - (unsigned long) bpts;
-	if (off >= sizeof(bpts))
+	off = nip - (unsigned long) bpt_table;
+	if (off >= sizeof(bpt_table))
 		return NULL;
-	off %= sizeof(struct bpt);
-	if (off != offsetof(struct bpt, instr[0])
-	    && off != offsetof(struct bpt, instr[1]))
+	bp_off = off % (sizeof(unsigned int) * BPT_WORDS);
+	if (bp_off != 0 && bp_off != 4)
 		return NULL;
-	*offp = off - offsetof(struct bpt, instr[0]);
-	return (struct bpt *) (nip - off);
+	*offp = bp_off;
+	return bpts + ((off - bp_off) / (sizeof(unsigned int) * BPT_WORDS));
 }
 
 static struct bpt *new_breakpoint(unsigned long a)
@@ -876,7 +879,8 @@ static struct bpt *new_breakpoint(unsigned long a)
 	for (bp = bpts; bp < &bpts[NBPTS]; ++bp) {
 		if (!bp->enabled && atomic_read(&bp->ref_count) == 0) {
 			bp->address = a;
-			patch_instruction(&bp->instr[1], bpinstr);
+			bp->instr = bpt_table + ((bp - bpts) * BPT_WORDS);
+			patch_instruction(bp->instr + 1, bpinstr);
 			return bp;
 		}
 	}
