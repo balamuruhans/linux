@@ -1812,7 +1812,11 @@ static void cacheflush(void)
 				cflush((void *) adrs);
 		} else {
 			for (; nflush > 0; --nflush, adrs += L1_CACHE_BYTES)
+#ifdef PPC_BOOK3S_64
+				cflush((void *) adrs);
+#else
 				cinval((void *) adrs);
+#endif
 		}
 		sync();
 		/* wait a little while to see if we get a machine check */
