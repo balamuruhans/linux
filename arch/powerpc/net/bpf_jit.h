@@ -106,7 +106,6 @@
 				     ___PPC_RS(a) | ___PPC_RB(b))
 #define PPC_OR(d, a, b)		EMIT(PPC_INST_OR | ___PPC_RA(d) |	      \
 				     ___PPC_RS(a) | ___PPC_RB(b))
-#define PPC_MR(d, a)		PPC_OR(d, a, a)
 #define PPC_ORI(d, a, i)	EMIT(PPC_INST_ORI | ___PPC_RA(d) |	      \
 				     ___PPC_RS(a) | IMM_L(i))
 #define PPC_ORIS(d, a, i)	EMIT(PPC_INST_ORIS | ___PPC_RA(d) |	      \
