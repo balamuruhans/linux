@@ -2349,11 +2349,12 @@ static void report_probe(struct seq_file *pi, struct kprobe *p,
 
 	if (!pp)
 		pp = p;
-	seq_printf(pi, "%s%s%s%s\n",
+	seq_printf(pi, "%s%s%s%s%s\n",
 		(kprobe_gone(p) ? "[GONE]" : ""),
 		((kprobe_disabled(p) && !kprobe_gone(p)) ?  "[DISABLED]" : ""),
 		(kprobe_optimized(pp) ? "[OPTIMIZED]" : ""),
-		(kprobe_ftrace(pp) ? "[FTRACE]" : ""));
+		(kprobe_ftrace(pp) ? "[FTRACE]" : ""),
+		(pp->ainsn.boostable == 1 ? "[BOOST]" : ""));
 }
 
 static void *kprobe_seq_start(struct seq_file *f, loff_t *pos)
