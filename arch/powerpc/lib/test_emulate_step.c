@@ -1171,14 +1171,6 @@ static struct compute_test compute_tests[] = {
 				}
 			},
 			{
-				.descr = "RA = INT_MAX, SI = INT_MAX",
-				.instr = TEST_PADDI(21, 22, INT_MAX, 0),
-				.regs = {
-					.gpr[21] = 0,
-					.gpr[22] = INT_MAX,
-				}
-			},
-			{
 				.descr = "RA = UINT_MAX, SI = 0x1",
 				.instr = TEST_PADDI(21, 22, 0x1, 0),
 				.regs = {
