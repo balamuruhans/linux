@@ -1206,7 +1206,14 @@ static int __init emulate_compute_instr(struct pt_regs *regs,
 
 	if (analyse_instr(&op, regs, instr) != 1 ||
 	    GETTYPE(op.type) != COMPUTE) {
-		pr_info("emulation failed, instruction = 0x%08x\n", ppc_inst_val(instr));
+		if (!ppc_inst_prefixed(instr)) {
+			pr_info("emulation failed, instruction = 0x%08x\n",
+					(unsigned int) ppc_inst_val(instr));
+		} else {
+			pr_info("emulation failed, instruction = 0x%08x 0x%08x\n",
+					(unsigned int) ppc_inst_val(instr),
+					(unsigned int) ppc_inst_suffix(instr));
+		}
 		return -EFAULT;
 	}
 
