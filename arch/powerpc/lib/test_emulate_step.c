@@ -18,6 +18,12 @@
 #define IMM_H(i)		(((uintptr_t)(i) >> 16) & 0x3ffff)
 
 /*
+ * In paddi form we have 34 bits SI, exercise tests
+ * with it to cover scenario
+ */
+#define BIT_34_MIN             BIT(33)
+
+/*
  * Defined with TEST_ prefix so it does not conflict with other
  * definitions.
  */
@@ -1108,8 +1114,8 @@ static struct compute_test compute_tests[] = {
 		.prefixed = true,
 		.subtests = {
 			{
-				.descr = "RA = LONG_MIN, SI = LONG_MIN",
-				.instr = TEST_PADDI(21, 22, LONG_MIN, 0),
+				.descr = "RA = LONG_MIN, SI = BIT_34_MIN",
+				.instr = TEST_PADDI(21, 22, BIT_34_MIN, 0),
 				.regs = {
 					.gpr[21] = 0,
 					.gpr[22] = LONG_MIN,
