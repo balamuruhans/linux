@@ -1212,8 +1212,8 @@ static int __init emulate_compute_instr(struct pt_regs *regs,
 	 * instruction
 	 */
 	if (ppc_inst_prefixed(instr)) {
-		prefix_r = instr & (1UL << 20);
-		ra = (sufx >> 16) & 0x1f;
+		prefix_r = GET_PREFIX_R(ppc_inst_val(instr));
+		ra = GET_PREFIX_RA(ppc_inst_suffix(instr));
 		if (prefix_r && !ra)
 			regs->nip = patch_site_addr(&patch__exec_instr);
 	}
