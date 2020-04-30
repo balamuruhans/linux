@@ -103,6 +103,7 @@ enum instruction_type {
 #define MKOP(t, f, s)	((t) | (f) | SIZE(s))
 
 extern s32 patch__exec_instr;
+extern s32 patch__exec_sufx;
 
 struct instruction_op {
 	int type;
