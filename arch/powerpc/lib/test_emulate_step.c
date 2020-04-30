@@ -1114,7 +1114,7 @@ static struct compute_test compute_tests[] = {
 		.prefixed = true,
 		.subtests = {
 			{
-				.descr = "RA = LONG_MIN, SI = BIT_34_MIN",
+				.descr = "RA = LONG_MIN, SI = BIT_34_MIN, R = 0",
 				.instr = TEST_PADDI(21, 22, BIT_34_MIN, 0),
 				.regs = {
 					.gpr[21] = 0,
@@ -1122,7 +1122,7 @@ static struct compute_test compute_tests[] = {
 				}
 			},
 			{
-				.descr = "RA = LONG_MIN, SI = LONG_MAX",
+				.descr = "RA = LONG_MIN, SI = LONG_MAX, R = 0",
 				.instr = TEST_PADDI(21, 22, LONG_MAX, 0),
 				.regs = {
 					.gpr[21] = 0,
@@ -1130,7 +1130,7 @@ static struct compute_test compute_tests[] = {
 				}
 			},
 			{
-				.descr = "RA = LONG_MAX, SI = LONG_MAX",
+				.descr = "RA = LONG_MAX, SI = LONG_MAX, R = 0",
 				.instr = TEST_PADDI(21, 22, LONG_MAX, 0),
 				.regs = {
 					.gpr[21] = 0,
@@ -1138,7 +1138,7 @@ static struct compute_test compute_tests[] = {
 				}
 			},
 			{
-				.descr = "RA = ULONG_MAX, SI = ULONG_MAX",
+				.descr = "RA = ULONG_MAX, SI = ULONG_MAX, R = 0",
 				.instr = TEST_PADDI(21, 22, ULONG_MAX, 0),
 				.regs = {
 					.gpr[21] = 0,
@@ -1146,7 +1146,7 @@ static struct compute_test compute_tests[] = {
 				}
 			},
 			{
-				.descr = "RA = ULONG_MAX, SI = 0x1",
+				.descr = "RA = ULONG_MAX, SI = 0x1, R = 0",
 				.instr = TEST_PADDI(21, 22, 0x1, 0),
 				.regs = {
 					.gpr[21] = 0,
@@ -1154,7 +1154,7 @@ static struct compute_test compute_tests[] = {
 				}
 			},
 			{
-				.descr = "RA = INT_MIN, SI = INT_MIN",
+				.descr = "RA = INT_MIN, SI = INT_MIN, R = 0",
 				.instr = TEST_PADDI(21, 22, INT_MIN, 0),
 				.regs = {
 					.gpr[21] = 0,
@@ -1162,7 +1162,7 @@ static struct compute_test compute_tests[] = {
 				}
 			},
 			{
-				.descr = "RA = INT_MIN, SI = INT_MAX",
+				.descr = "RA = INT_MIN, SI = INT_MAX, R = 0",
 				.instr = TEST_PADDI(21, 22, INT_MAX, 0),
 				.regs = {
 					.gpr[21] = 0,
@@ -1170,7 +1170,7 @@ static struct compute_test compute_tests[] = {
 				}
 			},
 			{
-				.descr = "RA = INT_MAX, SI = INT_MAX",
+				.descr = "RA = INT_MAX, SI = INT_MAX, R = 0",
 				.instr = TEST_PADDI(21, 22, INT_MAX, 0),
 				.regs = {
 					.gpr[21] = 0,
@@ -1178,7 +1178,7 @@ static struct compute_test compute_tests[] = {
 				}
 			},
 			{
-				.descr = "RA = UINT_MAX, SI = 0x1",
+				.descr = "RA = UINT_MAX, SI = 0x1, R = 0",
 				.instr = TEST_PADDI(21, 22, 0x1, 0),
 				.regs = {
 					.gpr[21] = 0,
@@ -1186,7 +1186,7 @@ static struct compute_test compute_tests[] = {
 				}
 			},
 			{
-				.descr = "RA = UINT_MAX, SI = UINT_MAX",
+				.descr = "RA = UINT_MAX, SI = UINT_MAX, R = 0",
 				.instr = TEST_PADDI(21, 22, UINT_MAX, 0),
 				.regs = {
 					.gpr[21] = 0,
