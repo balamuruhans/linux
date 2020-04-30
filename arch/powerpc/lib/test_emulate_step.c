@@ -1193,6 +1193,48 @@ static struct compute_test compute_tests[] = {
 					.gpr[21] = 0,
 					.gpr[22] = UINT_MAX,
 				}
+			},
+			{
+				.descr = "RA = 0, SI = BIT_34_MIN, R = 0",
+				.instr = TEST_PADDI(21, 0, BIT_34_MIN, 0),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[0] = 0,
+				}
+			},
+			{
+				.descr = "RA = R22(0), SI = BIT_34_MIN, R = 0",
+				.instr = TEST_PADDI(21, 0, BIT_34_MIN, 0),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[22] = 0,
+				}
+			},
+			{
+				.descr = "RA = 0, SI = 0, R = 1",
+				.instr = TEST_PADDI(21, 0, 0, 1),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[0] = 0,
+				}
+			},
+			{
+				.descr = "RA = 0, SI = BIT_34_MIN, R = 1",
+				.instr = TEST_PADDI(21, 0, BIT_34_MIN, 1),
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[0] = 0,
+				}
+			},
+			/* Invalid instruction form with R = 1 and RA != 0 */
+			{
+				.descr = "RA = R22(0), SI = 0, R = 1",
+				.instr = TEST_PADDI(21, 22, 0, 1),
+				.negative = true,
+				.regs = {
+					.gpr[21] = 0,
+					.gpr[22] = 0,
+				}
 			}
 		}
 	}
