@@ -1201,12 +1201,22 @@ static struct compute_test compute_tests[] = {
 static int __init emulate_compute_instr(struct pt_regs *regs,
 					struct ppc_inst instr, bool negative)
 {
-	int analysed;
+	int analysed, prefix_r, ra;
 	struct instruction_op op;
 
 	if (!regs || !ppc_inst_val(instr))
 		return -EINVAL;
-
+	/*
+	 * If R=1 and RA=0 in Prefixed instruction form, calculate the address
+	 * of the instruction and update nip to assert with executed
+	 * instruction
+	 */
+	if (ppc_inst_prefixed(instr)) {
+		prefix_r = instr & (1UL << 20);
+		ra = (sufx >> 16) & 0x1f;
+		if (prefix_r && !ra)
+			regs->nip = patch_site_addr(&patch__exec_instr);
+	}
 	analysed = analyse_instr(&op, regs, instr);
 	if ((analysed != 1) || GETTYPE(op.type) != COMPUTE) {
 		if (negative)
