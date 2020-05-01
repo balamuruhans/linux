@@ -733,6 +733,7 @@ struct compute_test {
 		unsigned long flags;
 		struct ppc_inst instr;
 		struct pt_regs regs;
+		bool negative;
 	} subtests[MAX_SUBTESTS + 1];
 };
 
@@ -1198,15 +1199,18 @@ static struct compute_test compute_tests[] = {
 };
 
 static int __init emulate_compute_instr(struct pt_regs *regs,
-					struct ppc_inst instr)
+					struct ppc_inst instr, bool negative)
 {
+	int analysed;
 	struct instruction_op op;
 
 	if (!regs || !ppc_inst_val(instr))
 		return -EINVAL;
 
-	if (analyse_instr(&op, regs, instr) != 1 ||
-	    GETTYPE(op.type) != COMPUTE) {
+	analysed = analyse_instr(&op, regs, instr);
+	if ((analysed != 1) || GETTYPE(op.type) != COMPUTE) {
+		if (negative)
+			return -EFAULT;
 		if (!ppc_inst_prefixed(instr)) {
 			pr_info("emulation failed, instruction = 0x%08x\n",
 					(unsigned int) ppc_inst_val(instr));
@@ -1217,8 +1221,18 @@ static int __init emulate_compute_instr(struct pt_regs *regs,
 		}
 		return -EFAULT;
 	}
-
-	emulate_update_regs(regs, &op);
+	if (analysed == 1 && negative) {
+		if (!ppc_inst_prefixed(instr)) {
+			pr_info("negative test failed, instruction = 0x%08x\n",
+					(unsigned int) ppc_inst_val(instr));
+		} else {
+			pr_info("negative test  failed, instruction = 0x%08x 0x%08x\n",
+					(unsigned int) ppc_inst_val(instr),
+					(unsigned int) ppc_inst_suffix(instr));
+		}
+	}
+	if (!negative)
+		emulate_update_regs(regs, &op);
 	return 0;
 }
 
@@ -1234,7 +1248,14 @@ static int __init execute_compute_instr(struct pt_regs *regs,
 	/* Patch the NOP with the actual instruction */
 	patch_instruction_site(&patch__exec_instr, instr);
 	if (exec_instr(regs)) {
-		pr_info("execution failed, instruction = 0x%08x\n", ppc_inst_val(instr));
+		if (!ppc_inst_prefixed(instr)) {
+			pr_info("execution failed, instruction = 0x%08x\n",
+					(unsigned int) ppc_inst_val(instr));
+		} else {
+			pr_info("execution failed, instruction = 0x%08x 0x%08x\n",
+					(unsigned int) ppc_inst_val(instr),
+					(unsigned int) ppc_inst_suffix(instr));
+		}
 		return -EFAULT;
 	}
 
@@ -1256,7 +1277,7 @@ static void __init run_tests_compute(void)
 	struct pt_regs *regs, exp, got;
 	unsigned int i, j, k;
 	struct ppc_inst instr;
-	bool ignore_gpr, ignore_xer, ignore_ccr, passed;
+	bool ignore_gpr, ignore_xer, ignore_ccr, passed, rc, negative;
 
 	for (i = 0; i < ARRAY_SIZE(compute_tests); i++) {
 		test = &compute_tests[i];
@@ -1269,6 +1290,7 @@ static void __init run_tests_compute(void)
 			instr = test->subtests[j].instr;
 			flags = test->subtests[j].flags;
 			regs = &test->subtests[j].regs;
+			negative = test->subtests[j].negative;
 			ignore_xer = flags & IGNORE_XER;
 			ignore_ccr = flags & IGNORE_CCR;
 			passed = true;
@@ -1285,8 +1307,12 @@ static void __init run_tests_compute(void)
 			exp.msr = MSR_KERNEL;
 			got.msr = MSR_KERNEL;
 
-			if (emulate_compute_instr(&got, instr) ||
-			    execute_compute_instr(&exp, instr)) {
+			rc = emulate_compute_instr(&got, instr, negative) != 0;
+			if (negative) {
+				/* skip executing instruction */
+				passed = rc;
+				goto print;
+			} else if (rc || execute_compute_instr(&exp, instr)) {
 				passed = false;
 				goto print;
 			}
