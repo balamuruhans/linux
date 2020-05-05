@@ -65,6 +65,7 @@ static unsigned long can_optimize(struct kprobe *p)
 {
 	struct pt_regs regs;
 	struct instruction_op op;
+	struct ppc_inst instr;
 	unsigned long nip = 0;
 
 	/*
@@ -100,9 +101,10 @@ static unsigned long can_optimize(struct kprobe *p)
 	 * Ensure that the instruction is not a conditional branch,
 	 * and that can be emulated.
 	 */
-	if (!is_conditional_branch(ppc_inst_read((struct ppc_inst *)p->ainsn.insn)) &&
+	instr = ppc_inst_read((struct ppc_inst *)p->ainsn.insn);
+	if (!is_conditional_branch(instr) &&
 			analyse_instr(&op, &regs, ppc_inst_read((struct ppc_inst *)p->ainsn.insn)) == 1) {
-		emulate_update_regs(&regs, &op);
+		emulate_update_regs(&regs, &op, instr);
 		nip = regs.nip;
 	}
 

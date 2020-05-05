@@ -183,10 +183,10 @@ static void __init test_pld(void)
 	unsigned long a = 0x23;
 	int stepped = -1;
 
-	if (!cpu_has_feature(CPU_FTR_ARCH_31)) {
+	/*if (!cpu_has_feature(CPU_FTR_ARCH_31)) {
 		show_result("pld", "SKIP (!CPU_FTR_ARCH_31)");
 		return;
-	}
+	}*/
 
 	instr = TEST_PLD(5, 3, 0, 0);
 
@@ -228,10 +228,10 @@ static void __init test_plwz(void)
 	unsigned int a = 0x4545;
 	int stepped = -1;
 
-	if (!cpu_has_feature(CPU_FTR_ARCH_31)) {
+	/*if (!cpu_has_feature(CPU_FTR_ARCH_31)) {
 		show_result("plwz", "SKIP (!CPU_FTR_ARCH_31)");
 		return;
-	}
+	}*/
 
 	instr = TEST_PLWZ(5, 3, 0, 0);
 
@@ -293,10 +293,10 @@ static void __init test_pstd(void)
 	unsigned long a = 0x1234;
 	int stepped = -1;
 
-	if (!cpu_has_feature(CPU_FTR_ARCH_31)) {
+	/*if (!cpu_has_feature(CPU_FTR_ARCH_31)) {
 		show_result("pstd", "SKIP (!CPU_FTR_ARCH_31)");
 		return;
-	}
+	}*/
 
 	instr = TEST_PSTD(5, 3, 0, 0);
 
@@ -421,10 +421,10 @@ static void __init test_plfs_pstfs(void)
 	int cached_b;
 	int stepped = -1;
 
-	if (!cpu_has_feature(CPU_FTR_ARCH_31)) {
+	/*if (!cpu_has_feature(CPU_FTR_ARCH_31)) {
 		show_result("pld", "SKIP (!CPU_FTR_ARCH_31)");
 		return;
-	}
+	}*/
 
 	instr = TEST_PLFS(10, 3, 0, 0);
 
@@ -517,10 +517,10 @@ static void __init test_plfd_pstfd(void)
 	long cached_b;
 	int stepped = -1;
 
-	if (!cpu_has_feature(CPU_FTR_ARCH_31)) {
+	/* if (!cpu_has_feature(CPU_FTR_ARCH_31)) {
 		show_result("pld", "SKIP (!CPU_FTR_ARCH_31)");
 		return;
-	}
+	}*/
 
 	instr = TEST_PLFD(10, 3, 0, 0);
 
@@ -1284,7 +1284,7 @@ static int __init emulate_compute_instr(struct pt_regs *regs,
 		}
 	}
 	if (!negative)
-		emulate_update_regs(regs, &op);
+		emulate_update_regs(regs, &op, instr);
 	return 0;
 }
 
@@ -1332,10 +1332,10 @@ static void __init run_tests_compute(void)
 
 	for (i = 0; i < ARRAY_SIZE(compute_tests); i++) {
 		test = &compute_tests[i];
-		if (test->prefixed && !cpu_has_feature(CPU_FTR_ARCH_31)) {
+		/*if (test->prefixed && !cpu_has_feature(CPU_FTR_ARCH_31)) {
 			show_result(test->mnemonic, "SKIP (!CPU_FTR_ARCH_31)");
 			continue;
-		}
+		}*/
 
 		for (j = 0; j < MAX_SUBTESTS && test->subtests[j].descr; j++) {
 			instr = test->subtests[j].instr;

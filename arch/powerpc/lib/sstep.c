@@ -2937,11 +2937,11 @@ static nokprobe_inline void do_byterev(unsigned long *valp, int size)
  * Emulate an instruction that can be executed just by updating
  * fields in *regs.
  */
-void emulate_update_regs(struct pt_regs *regs, struct instruction_op *op)
+void emulate_update_regs(struct pt_regs *regs, struct instruction_op *op, struct ppc_inst instr)
 {
 	unsigned long next_pc;
 
-	next_pc = truncate_if_32bit(regs->msr, regs->nip + GETLENGTH(op->type));
+	next_pc = truncate_if_32bit(regs->msr, regs->nip + ppc_inst_len(instr));
 	switch (GETTYPE(op->type)) {
 	case COMPUTE:
 		if (op->type & SETREG)
@@ -3297,7 +3297,7 @@ int emulate_step(struct pt_regs *regs, struct ppc_inst instr)
 	if (r < 0)
 		return r;
 	if (r > 0) {
-		emulate_update_regs(regs, &op);
+		emulate_update_regs(regs, &op, instr);
 		return 1;
 	}
 
@@ -3386,7 +3386,7 @@ int emulate_step(struct pt_regs *regs, struct ppc_inst instr)
 	return 0;
 
  instr_done:
-	regs->nip = truncate_if_32bit(regs->msr, regs->nip + GETLENGTH(op.type));
+	regs->nip = truncate_if_32bit(regs->msr, regs->nip + ppc_inst_len(instr));
 	return 1;
 }
 NOKPROBE_SYMBOL(emulate_step);

@@ -150,7 +150,7 @@ extern int analyse_instr(struct instruction_op *op, const struct pt_regs *regs,
  * Emulate an instruction that can be executed just by updating
  * fields in *regs.
  */
-void emulate_update_regs(struct pt_regs *reg, struct instruction_op *op);
+void emulate_update_regs(struct pt_regs *reg, struct instruction_op *op, struct ppc_inst instr);
 
 /*
  * Emulate instructions that cause a transfer of control,
