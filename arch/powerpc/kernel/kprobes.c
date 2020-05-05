@@ -106,13 +106,20 @@ kprobe_opcode_t *kprobe_lookup_name(const char *name, unsigned int offset)
 int arch_prepare_kprobe(struct kprobe *p)
 {
 	int ret = 0;
+	struct kprobe *prev;
 	struct ppc_inst insn = ppc_inst_read((struct ppc_inst *)p->addr);
 
+	preempt_disable();
 	if ((unsigned long)p->addr & 0x03) {
 		printk("Attempt to register kprobe at an unaligned address\n");
 		ret = -EINVAL;
 	} else if (IS_MTMSRD(insn) || IS_RFID(insn) || IS_RFI(insn)) {
 		printk("Cannot register a kprobe on rfi/rfid or mtmsr[d]\n");
+		ret = -EINVAL;
+	}
+	prev = get_kprobe(p->addr - 1);
+	if (prev && ppc_inst_prefixed(insn)) {
+		printk("Cannot register a kprobe on the second word of prefixed instruction\n");
 		ret = -EINVAL;
 	}
 
@@ -130,6 +137,7 @@ int arch_prepare_kprobe(struct kprobe *p)
 	}
 
 	p->ainsn.boostable = 0;
+	preempt_enable_no_resched();
 	return ret;
 }
 NOKPROBE_SYMBOL(arch_prepare_kprobe);
@@ -231,7 +239,10 @@ static int try_to_emulate(struct kprobe *p, struct pt_regs *regs)
 		 * So, we should never get here... but, its still
 		 * good to catch them, just in case...
 		 */
-		printk("Can't step on instruction %x\n", ppc_inst_val(insn));
+		if(!ppc_inst_prefixed(insn))
+			printk("Can't step on instruction %x\n", ppc_inst_val(insn));
+		else
+			printk("Can't step on instruction %x:%x\n", ppc_inst_val(insn), ppc_inst_suffix(insn));
 		BUG();
 	} else {
 		/*
@@ -434,9 +445,10 @@ static int trampoline_probe_handler(struct kprobe *p, struct pt_regs *regs)
 	 * the link register properly so that the subsequent 'blr' in
 	 * kretprobe_trampoline jumps back to the right instruction.
 	 *
-	 * For nip, we should set the address to the previous instruction since
-	 * we end up emulating it in kprobe_handler(), which increments the nip
-	 * again.
+	 * To keep the nip at the correct address we need to counter the
+	 * increment that happens when we emulate the kretprobe_trampoline noop
+	 * in kprobe_handler(). We do this by decrementing the address by the
+	 * length of the noop which is always 4 bytes.
 	 */
 	regs->nip = orig_ret_address - 4;
 	regs->link = orig_ret_address;

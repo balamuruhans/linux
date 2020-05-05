@@ -38,6 +38,7 @@ extern kprobe_opcode_t optprobe_template_entry[];
 extern kprobe_opcode_t optprobe_template_op_address[];
 extern kprobe_opcode_t optprobe_template_call_handler[];
 extern kprobe_opcode_t optprobe_template_insn[];
+extern kprobe_opcode_t optprobe_template_suffix[];
 extern kprobe_opcode_t optprobe_template_call_emulate[];
 extern kprobe_opcode_t optprobe_template_ret[];
 extern kprobe_opcode_t optprobe_template_end[];
