@@ -1351,9 +1351,10 @@ int analyse_instr(struct instruction_op *op, const struct pt_regs *regs,
 				return 0;
 			switch (suffixopcode) {
 			case 14:	/* paddi */
-				op->type = COMPUTE | PREFIXED;
-				op->val = mlsd_8lsd_ea(word, suffix, regs);
-				goto compute_done;
+				return 0;
+				//op->type = COMPUTE | PREFIXED;
+				//op->val = mlsd_8lsd_ea(word, suffix, regs);
+				//goto compute_done;
 			}
 		}
 		break;
