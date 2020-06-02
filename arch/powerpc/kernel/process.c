@@ -1257,7 +1257,7 @@ static void show_instructions(struct pt_regs *regs)
 	printk("Instruction dump:");
 
 	for (i = 0; i < NR_INSN_TO_PRINT; i++) {
-		int instr;
+		struct ppc_inst instr;
 
 		if (!(i % 8))
 			pr_cont("\n");
@@ -1271,16 +1271,17 @@ static void show_instructions(struct pt_regs *regs)
 #endif
 
 		if (!__kernel_text_address(pc) ||
-		    get_kernel_nofault(instr, (const void *)pc)) {
+		    probe_kernel_read_inst(&instr, (struct ppc_inst *)pc)) {
+			instr = ppc_inst(PPC_INST_NOP);
 			pr_cont("XXXXXXXX ");
 		} else {
 			if (regs->nip == pc)
-				pr_cont("<%08x> ", instr);
+				pr_cont("<%s> ", ppc_inst_as_str(instr));
 			else
-				pr_cont("%08x ", instr);
+				pr_cont("%s ", ppc_inst_as_str(instr));
 		}
 
-		pc += sizeof(int);
+		pc += ppc_inst_len(instr);
 	}
 
 	pr_cont("\n");
