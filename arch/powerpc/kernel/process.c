@@ -1291,7 +1291,8 @@ void show_user_instructions(struct pt_regs *regs)
 	unsigned long pc;
 	int n = NR_INSN_TO_PRINT;
 	struct seq_buf s;
-	char buf[96]; /* enough for 8 times 9 + 2 chars */
+	char buf[8 * sizeof("0x00000000 0x00000000") + 2];
+	struct ppc_inst instr;
 
 	pc = regs->nip - (NR_INSN_TO_PRINT * 3 / 4 * sizeof(int));
 
@@ -1302,15 +1303,15 @@ void show_user_instructions(struct pt_regs *regs)
 
 		seq_buf_clear(&s);
 
-		for (i = 0; i < 8 && n; i++, n--, pc += sizeof(int)) {
-			int instr;
+		for (i = 0; i < 8 && n; i++, n--, pc += ppc_inst_len(instr)) {
 
-			if (copy_from_user_nofault(&instr, (void __user *)pc,
-					sizeof(instr))) {
+			if (probe_user_read_inst(&instr, (void __user *)pc)) {
 				seq_buf_printf(&s, "XXXXXXXX ");
+				instr = ppc_inst(PPC_INST_NOP);
 				continue;
 			}
-			seq_buf_printf(&s, regs->nip == pc ? "<%08x> " : "%08x ", instr);
+			seq_buf_printf(&s, regs->nip == pc ? "<%s> " : "%s ",
+				       ppc_inst_as_str(instr));
 		}
 
 		if (!seq_buf_has_overflowed(&s))
