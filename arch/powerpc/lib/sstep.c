@@ -14,6 +14,7 @@
 #include <asm/cpu_has_feature.h>
 #include <asm/cputable.h>
 #include <asm/disassemble.h>
+#include <asm/cacheflush.h>
 
 extern char system_call_common[];
 
@@ -1175,6 +1176,16 @@ static nokprobe_inline int trap_compare(long v1, long v2)
 	return ret;
 }
 
+static int cache_inhibited_inst(struct instruction_op *op, const struct pt_regs *regs,
+				enum instruction_type type)
+{
+	flush_dcache_range(op->ea, op->ea + op->element_size);
+	if (!(regs->msr & MSR_HV) || (regs->msr & MSR_DR))
+		return 0;
+	op->type = MKOP(type, 0, op->element_size);
+	return 1;
+}
+
 /*
  * Elements of 32-bit rotate and mask instructions.
  */
@@ -2285,6 +2296,31 @@ int analyse_instr(struct instruction_op *op, const struct pt_regs *regs,
 			op->type = MKOP(LOAD_FP, 0, 16);
 			break;
 
+		case 821:	/* lhzcix */
+			op->element_size = 2;
+			if (!cache_inhibited_inst(op, regs, LOAD))
+				return -1;
+			break;
+		case 885:	/* ldcix */
+			op->element_size = 8;
+			if (!cache_inhibited_inst(op, regs, LOAD))
+				return -1;
+			break;
+		case 981:	/* stbcix */
+			op->element_size = 1;
+			if (!cache_inhibited_inst(op, regs, STORE))
+				return -1;
+			break;
+		case 917:	/* stwcix */
+			op->element_size = 4;
+			if (!cache_inhibited_inst(op, regs, STORE))
+				return -1;
+			break;
+		case 1013:	/* stdcix */
+			op->element_size = 8;
+			if (!cache_inhibited_inst(op, regs, STORE))
+				return -1;
+			break;
 		case 855:	/* lfiwax */
 			op->type = MKOP(LOAD_FP, SIGNEXT, 4);
 			break;
