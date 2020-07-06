@@ -23,6 +23,16 @@
  */
 #define TEST_LD(r, base, i)	ppc_inst(PPC_INST_LD | ___PPC_RT(r) |		\
 					___PPC_RA(base) | IMM_DS(i))
+#define TEST_LDCIX(t, a, b)	ppc_inst(PPC_INST_LDCIX | ___PPC_RT(t) |	\
+					___PPC_RA(a) | ___PPC_RB(b))
+#define TEST_LHZCIX(t, a, b)	ppc_inst(PPC_INST_LHZCIX | ___PPC_RT(t) |	\
+					___PPC_RA(a) | ___PPC_RB(b))
+#define TEST_STWCIX(t, a, b)	ppc_inst(PPC_INST_STWCIX | ___PPC_RT(t) |	\
+					___PPC_RA(a) | ___PPC_RB(b))
+#define TEST_STDCIX(t, a, b)	ppc_inst(PPC_INST_STDCIX | ___PPC_RT(t) |	\
+					___PPC_RA(a) | ___PPC_RB(b))
+#define TEST_STBCIX(t, a, b)	ppc_inst(PPC_INST_STBCIX | ___PPC_RT(t) |	\
+					___PPC_RA(a) | ___PPC_RB(b))
 #define TEST_PLD(r, base, i, pr)	ppc_inst_prefix(PPC_PREFIX_8LS |	\
 						__PPC_PRFX_R(pr) |	\
 						IMM_H(i),		\
@@ -168,6 +178,111 @@ static void __init test_ld(void)
 		show_result("ld", "PASS");
 	else
 		show_result("ld", "FAIL");
+}
+
+static void __init test_ldcix(void)
+{
+	struct pt_regs regs;
+	unsigned long a = 0x2314576912323454;
+	int stepped = -1;
+
+	init_pt_regs(&regs);
+	regs.gpr[3] = (unsigned long)&a;
+	regs.gpr[4] = 0;
+	regs.msr |= MSR_HV;
+	regs.msr &= ~MSR_DR;
+
+	/* ldcix r5, r4, r3 */
+	stepped = emulate_step(&regs, TEST_LDCIX(5, 4, 3));
+
+	if (stepped == 1 && regs.gpr[5] == a)
+		show_result("ldcix", "PASS");
+	else
+		show_result("ldcix", "FAIL");
+}
+
+static void __init test_lhzcix(void)
+{
+	struct pt_regs regs;
+	unsigned long a = 0x2354;
+	int stepped = -1;
+
+	init_pt_regs(&regs);
+	regs.gpr[3] = (unsigned long)&a;
+	regs.gpr[4] = 0;
+	regs.msr |= MSR_HV;
+	regs.msr &= ~MSR_DR;
+
+	/* lhzcix r5, r4, r3 */
+	stepped = emulate_step(&regs, TEST_LHZCIX(5, 4, 3));
+
+	if (stepped == 1 && regs.gpr[5] == a)
+		show_result("lhzcix", "PASS");
+	else
+		show_result("lhzcix", "FAIL");
+}
+
+static void __init test_stwcix(void)
+{
+	struct pt_regs regs;
+	unsigned long a = 0x12345678;
+	int stepped = -1;
+
+	init_pt_regs(&regs);
+	regs.gpr[3] = (unsigned long)&a;
+	regs.gpr[4] = 0;
+	regs.gpr[5] = 0x56781234;
+	regs.msr |= MSR_HV;
+	regs.msr &= ~MSR_DR;
+
+	/* stwcix r5, r4, r3 */
+	stepped = emulate_step(&regs, TEST_STWCIX(5, 4, 3));
+	if (stepped == 1 && regs.gpr[5] == a)
+		show_result("stwcix", "PASS");
+	else
+		show_result("stwcix", "FAIL");
+}
+
+static void __init test_stdcix(void)
+{
+	struct pt_regs regs;
+	unsigned long a = 0x1234567812345678;
+	int stepped = -1;
+
+	init_pt_regs(&regs);
+	regs.gpr[3] = (unsigned long)&a;
+	regs.gpr[4] = 0;
+	regs.gpr[5] = 0x5678123456781234;
+	regs.msr |= MSR_HV;
+	regs.msr &= ~MSR_DR;
+
+	/* stdcix r5, r4, r3 */
+	stepped = emulate_step(&regs, TEST_STDCIX(5, 4, 3));
+	if (stepped == 1 && regs.gpr[5] == a)
+		show_result("stdcix", "PASS");
+	else
+		show_result("stdcix", "FAIL");
+}
+
+static void __init test_stbcix(void)
+{
+	struct pt_regs regs;
+	unsigned long a = 0x12;
+	int stepped = -1;
+
+	init_pt_regs(&regs);
+	regs.gpr[3] = (unsigned long)&a;
+	regs.gpr[4] = 0;
+	regs.gpr[5] = 0x56;
+	regs.msr |= MSR_HV;
+	regs.msr &= ~MSR_DR;
+
+	/* stbcix r5, r4, r3 */
+	stepped = emulate_step(&regs, TEST_STBCIX(5, 4, 3));
+	if (stepped == 1 && regs.gpr[5] == a)
+		show_result("stbcix", "PASS");
+	else
+		show_result("stbcix", "FAIL");
 }
 
 static void __init test_pld(void)
@@ -680,6 +795,11 @@ static void __init test_lxvd2x_stxvd2x(void)
 static void __init run_tests_load_store(void)
 {
 	test_ld();
+	test_ldcix();
+	test_lhzcix();
+	test_stwcix();
+	test_stdcix();
+	test_stbcix();
 	test_pld();
 	test_lwz();
 	test_plwz();
