@@ -1210,7 +1210,7 @@ int analyse_instr(struct instruction_op *op, const struct pt_regs *regs,
 	unsigned int opcode, ra, rb, rc, rd, spr, u;
 	unsigned long int imm;
 	unsigned long int val, val2;
-	unsigned int mb, me, sh;
+	unsigned int mb, me, sh, bfa;
 	unsigned int word, suffix;
 	long ival;
 
@@ -1594,6 +1594,9 @@ int analyse_instr(struct instruction_op *op, const struct pt_regs *regs,
 			op->reg = rd;
 			op->val = 0xffffffff & ~(MSR_ME | MSR_LE);
 			return 0;
+		case 128:	/* setb */
+			bfa = ((word >> 18) & 0x07);
+
 #ifdef CONFIG_PPC64
 		case 178:	/* mtmsrd */
 			if (regs->msr & MSR_PR)
