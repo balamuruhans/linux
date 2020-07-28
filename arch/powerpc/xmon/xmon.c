@@ -1600,6 +1600,7 @@ const char *getvecname(unsigned long vec)
 	case 0x1300:	ret = "(Instruction Breakpoint)"; break;
 	case 0x1500:	ret = "(Denormalisation)"; break;
 	case 0x1700:	ret = "(Altivec Assist)"; break;
+	case 0x3000:	ret = "(System Call Vectored)"; break;
 	default: ret = "";
 	}
 	return ret;
@@ -2029,6 +2030,18 @@ static void dump_300_sprs(void)
 #endif
 }
 
+static void dump_310_sprs(void)
+{
+#ifdef CONFIG_PPC64
+	if (!cpu_has_feature(CPU_FTR_ARCH_31))
+		return;
+
+	printf("mmcr3  = %.16lx, sier2  = %.16lx, sier3  = %.16lx\n",
+		mfspr(SPRN_MMCR3), mfspr(SPRN_SIER2), mfspr(SPRN_SIER3));
+
+#endif
+}
+
 static void dump_one_spr(int spr, bool show_unimplemented)
 {
 	unsigned long val;
@@ -2083,6 +2096,7 @@ static void super_regs(void)
 		dump_206_sprs();
 		dump_207_sprs();
 		dump_300_sprs();
+		dump_310_sprs();
 
 		return;
 	}

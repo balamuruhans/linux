@@ -122,14 +122,14 @@ static inline u64 ppc_inst_as_u64(struct ppc_inst x)
 #endif
 }
 
-#define PPC_INST_STR_LEN sizeof("0x00000000 0x00000000")
+#define PPC_INST_STR_LEN sizeof("00000000 00000000")
 
 static inline char *__ppc_inst_as_str(char str[PPC_INST_STR_LEN], struct ppc_inst x)
 {
 	if (ppc_inst_prefixed(x))
-		sprintf(str, "0x%08x 0x%08x", ppc_inst_val(x), ppc_inst_suffix(x));
+		sprintf(str, "%08x %08x", ppc_inst_val(x), ppc_inst_suffix(x));
 	else
-		sprintf(str, "0x%08x", ppc_inst_val(x));
+		sprintf(str, "%08x", ppc_inst_val(x));
 
 	return str;
 }
