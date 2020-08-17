@@ -1020,6 +1020,187 @@ static struct compute_test compute_tests[] = {
 		}
 	},
 	{
+		.mnemonic = "subf",
+		.subtests = {
+			{
+				.descr = "RA = LONG_MIN, RB = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SUBF(20, 21, 22)),
+				.regs = {
+					.gpr[21] = (unsigned long)~LONG_MIN + 1,
+					.gpr[22] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RA = LONG_MAX, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SUBF(20, 21, 22)),
+				.regs = {
+					.gpr[21] = ~LONG_MAX + 1,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RA = LONG_MIN, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SUBF(20, 21, 22)),
+				.regs = {
+					.gpr[21] = (unsigned long)~LONG_MIN + 1,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RA = -1L, RB = 1L",
+				.instr = ppc_inst(PPC_RAW_SUBF(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 1L,
+					.gpr[22] = 1L,
+				}
+			}
+		}
+	},
+	{
+		.mnemonic = "subf.",
+		.subtests = {
+			{
+				.descr = "RA = LONG_MIN, RB = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SUBF_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = (unsigned long)~LONG_MIN + 1,
+					.gpr[22] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RA = LONG_MAX, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SUBF_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = ~LONG_MAX + 1,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RA = LONG_MIN, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SUBF_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = (unsigned long)~LONG_MIN + 1,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RA = -1L, RB = 1L",
+				.instr = ppc_inst(PPC_RAW_SUBF_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 1L,
+					.gpr[22] = 1L,
+				}
+			}
+		}
+	},
+	{
+		.mnemonic = "subfc",
+		.subtests = {
+			{
+				.descr = "RA = LONG_MIN, RB = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SUBFC(20, 21, 22)),
+				.regs = {
+					.gpr[21] = (unsigned long)~LONG_MIN + 1,
+					.gpr[22] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RA = LONG_MAX, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SUBFC(20, 21, 22)),
+				.regs = {
+					.gpr[21] = ~LONG_MAX + 1,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RA = LONG_MIN, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SUBFC(20, 21, 22)),
+				.regs = {
+					.gpr[21] = (unsigned long)~LONG_MIN + 1,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RA = -1L, RB = 1L",
+				.instr = ppc_inst(PPC_RAW_SUBFC(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 1L,
+					.gpr[22] = 1L,
+				}
+			}
+		}
+	},
+	{
+		.mnemonic = "subfc.",
+		.subtests = {
+			{
+				.descr = "RA = LONG_MIN, RB = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SUBFC_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = (unsigned long)~LONG_MIN + 1,
+					.gpr[22] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RA = LONG_MAX, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SUBFC_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = ~LONG_MAX + 1,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RA = LONG_MIN, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SUBFC_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = (unsigned long)~LONG_MIN + 1,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RA = -1L, RB = 1L",
+				.instr = ppc_inst(PPC_RAW_SUBFC_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 1L,
+					.gpr[22] = 1L,
+				}
+			}
+		}
+	},
+	{
+		.mnemonic = "subfic",
+		.subtests = {
+			{
+				.descr = "RA = LONG_MIN, i = 0L",
+				.instr = ppc_inst(PPC_RAW_SUBFIC(20, 21, 0L)),
+				.regs = {
+					.gpr[21] = (unsigned long)~LONG_MIN + 1
+				}
+			},
+			{
+				.descr = "RA = -1L, i = 1L",
+				.instr = ppc_inst(PPC_RAW_SUBFIC(20, 21, 1L)),
+				.regs = {
+					.gpr[21] = 1L
+				}
+			},
+			{
+				.descr = "RA = LONG_MIN, i = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SUBFIC(20, 21, LONG_MAX)),
+				.regs = {
+					.gpr[21] = (unsigned long)~LONG_MIN + 1
+				}
+			},
+			{
+				.descr = "RA = LONG_MAX, i = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SUBFIC(20, 21, LONG_MAX)),
+				.regs = {
+					.gpr[21] = ~LONG_MAX + 1
+				}
+			}
+		}
+	},
+	{
 		.mnemonic = "divde",
 		.subtests = {
 			{
