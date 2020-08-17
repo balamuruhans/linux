@@ -47,7 +47,8 @@ CFLAGS += -DPACKAGE='"bpftool"' -D__EXPORTED_HEADERS__ \
 	-I$(srctree)/tools/include \
 	-I$(srctree)/tools/include/uapi \
 	-I$(srctree)/tools/lib \
-	-I$(srctree)/tools/perf
+	-I$(srctree)/tools/perf \
+	-I$(srctree)/usr/include
 CFLAGS += -DBPFTOOL_VERSION='"$(BPFTOOL_VERSION)"'
 ifneq ($(EXTRA_CFLAGS),)
 CFLAGS += $(EXTRA_CFLAGS)
