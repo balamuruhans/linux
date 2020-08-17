@@ -6,6 +6,7 @@
 #include <string.h>
 #include <sys/resource.h>
 #include <time.h>
+#include <inttypes.h>
 #include <bpf/libbpf.h>
 #include <bpf/bpf.h>
 #include "runqslower.h"
@@ -108,12 +109,12 @@ void handle_event(void *ctx, int cpu, void *data, __u32 data_sz)
 	time(&t);
 	tm = localtime(&t);
 	strftime(ts, sizeof(ts), "%H:%M:%S", tm);
-	printf("%-8s %-16s %-6d %14llu\n", ts, e->task, e->pid, e->delta_us);
+	printf("%-8s %-16s %-6d %14" PRIu64 "\n", ts, e->task, e->pid, e->delta_us);
 }
 
 void handle_lost_events(void *ctx, int cpu, __u64 lost_cnt)
 {
-	printf("Lost %llu events on CPU #%d!\n", lost_cnt, cpu);
+	printf("Lost %" PRIu64 " events on CPU #%d!\n", lost_cnt, cpu);
 }
 
 int main(int argc, char **argv)
@@ -162,7 +163,7 @@ int main(int argc, char **argv)
 		goto cleanup;
 	}
 
-	printf("Tracing run queue latency higher than %llu us\n", env.min_us);
+	printf("Tracing run queue latency higher than %" PRIu64 " us\n", env.min_us);
 	printf("%-8s %-16s %-6s %14s\n", "TIME", "COMM", "PID", "LAT(us)");
 
 	pb_opts.sample_cb = handle_event;
