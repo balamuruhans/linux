@@ -493,7 +493,9 @@
 #define PPC_RAW_SRAWI(d, a, i)		(0x7c000670 | ___PPC_RA(d) | ___PPC_RS(a) | __PPC_SH(i))
 #define PPC_RAW_SRD(d, a, s)		(0x7c000436 | ___PPC_RA(d) | ___PPC_RS(a) | ___PPC_RB(s))
 #define PPC_RAW_SRAD(d, a, s)		(0x7c000634 | ___PPC_RA(d) | ___PPC_RS(a) | ___PPC_RB(s))
+#define PPC_RAW_SRAD_DOT(d, a, s)	(0x7c000634 | ___PPC_RA(d) | ___PPC_RS(a) | ___PPC_RB(s) | 0x1)
 #define PPC_RAW_SRADI(d, a, i)		(0x7c000674 | ___PPC_RA(d) | ___PPC_RS(a) | __PPC_SH64(i))
+#define PPC_RAW_SRADI_DOT(d, a, i)	(0x7c000674 | ___PPC_RA(d) | ___PPC_RS(a) | __PPC_SH64(i) | 0x1)
 #define PPC_RAW_RLWINM(d, a, i, mb, me)	(0x54000000 | ___PPC_RA(d) | ___PPC_RS(a) | __PPC_SH(i) | __PPC_MB(mb) | __PPC_ME(me))
 #define PPC_RAW_RLWINM_DOT(d, a, i, mb, me) \
 					(0x54000001 | ___PPC_RA(d) | ___PPC_RS(a) | __PPC_SH(i) | __PPC_MB(mb) | __PPC_ME(me))
