@@ -1201,6 +1201,386 @@ static struct compute_test compute_tests[] = {
 		}
 	},
 	{
+		.mnemonic = "srad",
+		.subtests = {
+			{
+				.descr = "RS = LONG_MIN, RB = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAD(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+					.gpr[22] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAD(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = LONG_MAX, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAD(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MAX,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, RB = ULONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAD(20, 21, 22)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+					.gpr[22] = ULONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, RB = 0x1",
+				.instr = ppc_inst(PPC_RAW_SRAD(20, 21, 22)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+					.gpr[22] = 0x1,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, RB = INT_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAD(20, 21, 22)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+					.gpr[22] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, RB = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAD(20, 21, 22)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+					.gpr[22] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RS = INT_MAX, RB = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAD(20, 21, 22)),
+				.regs = {
+					.gpr[21] = INT_MAX,
+					.gpr[22] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RS = UINT_MAX, RB = UINT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAD(20, 21, 22)),
+				.regs = {
+					.gpr[21] = UINT_MAX,
+					.gpr[22] = UINT_MAX,
+				}
+			},
+			{
+				.descr = "RS = UINT_MAX, RB = 0x1",
+				.instr = ppc_inst(PPC_RAW_SRAD(20, 21, 22)),
+				.regs = {
+					.gpr[21] = UINT_MAX,
+					.gpr[22] = 0x1,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN | INT_MIN, RB = LONG_MIN | INT_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAD(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MIN | (uint)INT_MIN,
+					.gpr[22] = LONG_MIN | (uint)INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, RB = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAD(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+					.gpr[22] = LONG_MIN,
+				}
+			}
+		}
+	},
+	{
+		.mnemonic = "srad.",
+		.subtests = {
+			{
+				.descr = "RS = LONG_MIN, RB = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAD_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+					.gpr[22] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAD_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = LONG_MAX, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAD_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MAX,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, RB = ULONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAD_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+					.gpr[22] = ULONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, RB = 0x1",
+				.instr = ppc_inst(PPC_RAW_SRAD_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+					.gpr[22] = 0x1,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, RB = INT_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAD_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+					.gpr[22] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, RB = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAD_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+					.gpr[22] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RS = INT_MAX, RB = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAD_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = INT_MAX,
+					.gpr[22] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RS = UINT_MAX, RB = UINT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAD_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = UINT_MAX,
+					.gpr[22] = UINT_MAX,
+				}
+			},
+			{
+				.descr = "RS = UINT_MAX, RB = 0x1",
+				.instr = ppc_inst(PPC_RAW_SRAD_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = UINT_MAX,
+					.gpr[22] = 0x1,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN | INT_MIN, RB = LONG_MIN | INT_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAD_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MIN | (uint)INT_MIN,
+					.gpr[22] = LONG_MIN | (uint)INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, RB = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAD_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+					.gpr[22] = LONG_MIN,
+				}
+			}
+		}
+	},
+	{
+		.mnemonic = "sradi",
+		.subtests = {
+			{
+				.descr = "RS = LONG_MIN, SH = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SRADI(20, 21, LONG_MIN)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, SH = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRADI(20, 21, LONG_MAX)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MAX, SH = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRADI(20, 21, LONG_MAX)),
+				.regs = {
+					.gpr[21] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, SH = ULONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRADI(20, 21, ULONG_MAX)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, SH = 0x1",
+				.instr = ppc_inst(PPC_RAW_SRADI(20, 21, 0x1)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, SH = INT_MIN",
+				.instr = ppc_inst(PPC_RAW_SRADI(20, 21, INT_MIN)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, SH = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRADI(20, 21, INT_MAX)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = INT_MAX, SH = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRADI(20, 21, INT_MAX)),
+				.regs = {
+					.gpr[21] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RS = UINT_MAX, SH = UINT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRADI(20, 21, UINT_MAX)),
+				.regs = {
+					.gpr[21] = UINT_MAX,
+				}
+			},
+			{
+				.descr = "RS = UINT_MAX, SH = 0x1",
+				.instr = ppc_inst(PPC_RAW_SRADI(20, 21, 0x1)),
+				.regs = {
+					.gpr[21] = UINT_MAX,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN | INT_MIN, SH = LONG_MIN | INT_MIN",
+				.instr = ppc_inst(PPC_RAW_SRADI(20, 21, LONG_MIN | (uint)INT_MIN)),
+				.regs = {
+					.gpr[21] = LONG_MIN | (uint)INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, SH = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SRADI(20, 21, LONG_MIN)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+				}
+			}
+		}
+	},
+	{
+		.mnemonic = "sradi.",
+		.subtests = {
+			{
+				.descr = "RS = LONG_MIN, SH = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SRADI_DOT(20, 21, LONG_MIN)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, SH = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRADI_DOT(20, 21, LONG_MAX)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MAX, SH = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRADI_DOT(20, 21, LONG_MAX)),
+				.regs = {
+					.gpr[21] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, SH = ULONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRADI_DOT(20, 21, ULONG_MAX)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, SH = 0x1",
+				.instr = ppc_inst(PPC_RAW_SRADI_DOT(20, 21, 0x1)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, SH = INT_MIN",
+				.instr = ppc_inst(PPC_RAW_SRADI_DOT(20, 21, INT_MIN)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, SH = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRADI_DOT(20, 21, INT_MAX)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = INT_MAX, SH = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRADI_DOT(20, 21, INT_MAX)),
+				.regs = {
+					.gpr[21] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RS = UINT_MAX, SH = UINT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRADI_DOT(20, 21, UINT_MAX)),
+				.regs = {
+					.gpr[21] = UINT_MAX,
+				}
+			},
+			{
+				.descr = "RS = UINT_MAX, SH = 0x1",
+				.instr = ppc_inst(PPC_RAW_SRADI_DOT(20, 21, 0x1)),
+				.regs = {
+					.gpr[21] = UINT_MAX,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN | INT_MIN, SH = LONG_MIN | INT_MIN",
+				.instr = ppc_inst(PPC_RAW_SRADI_DOT(20, 21, LONG_MIN | (uint)INT_MIN)),
+				.regs = {
+					.gpr[21] = LONG_MIN | (uint)INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, SH = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SRADI_DOT(20, 21, LONG_MIN)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+				}
+			}
+		}
+	},
+	{
 		.mnemonic = "divde",
 		.subtests = {
 			{
