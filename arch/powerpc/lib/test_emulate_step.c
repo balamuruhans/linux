@@ -1747,6 +1747,540 @@ static struct compute_test compute_tests[] = {
 		}
 	},
 	{
+		.mnemonic = "sraw",
+		.subtests = {
+			{
+				.descr = "RS = LONG_MIN, RB = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+					.gpr[22] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = LONG_MAX, RB = LONG_MAX",
+				.flags = IGNORE_CCR,
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MAX,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, RB = ULONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+					.gpr[22] = ULONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, RB = 0x1",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+					.gpr[22] = 0x1,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, RB = INT_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+					.gpr[22] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, RB = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+					.gpr[22] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RS = INT_MAX, RB = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = INT_MAX,
+					.gpr[22] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RS = UINT_MAX, RB = UINT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = UINT_MAX,
+					.gpr[22] = UINT_MAX,
+				}
+			},
+			{
+				/* Test for sh < 32 */
+				.descr = "RS = 0xffff, RB = 0x0",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0xfffff,
+					.gpr[22] = 0x0,
+				}
+			},
+
+			{
+				/* Test for sh < 32 */
+				.descr = "RS = 0xfff, RB = 0x20",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0xfff,
+					.gpr[22] = 0x20,
+				}
+			},
+			{
+				/* Check for (RS)32 sign propagate */
+				.descr = "RS = 100000011, RB = 0xff1",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0x100000011,
+					.gpr[22] = 0xff1,
+				}
+			},
+			{
+				/* Check for (RS)32 sign propagate */
+				.descr = "RS = 100000011, RB = 0x11",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0x100000011,
+					.gpr[22] = 0x11,
+				}
+			},
+			{
+				/* Verify (RS)58 MASK bits */
+				.descr = "RS = 0x11, RB = 0xff1",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0x11,
+					.gpr[22] = 0xff1,
+				}
+			},
+			{
+				/* Test for MASK flag */
+				.descr = "RS = 0xffff, RB = 0xff1",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0xffff,
+					.gpr[22] = 0xff1,
+				}
+			},
+			{
+				/* Test for CARRY (CA/CA32) flag */
+				.descr = "RS = 1FF000001, RB = FC00000000000000",
+				.instr = ppc_inst(PPC_RAW_SRAW(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0x1FF000001,
+					.gpr[22] = 0xFC00000000000000,
+				}
+			}
+		}
+	},
+	{
+		.mnemonic = "sraw.",
+		.subtests = {
+			{
+				.descr = "RS = LONG_MIN, RB = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+					.gpr[22] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, RB = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = LONG_MAX, RB = LONG_MAX",
+				.flags = IGNORE_CCR,
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = LONG_MAX,
+					.gpr[22] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, RB = ULONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+					.gpr[22] = ULONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, RB = 0x1",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+					.gpr[22] = 0x1,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, RB = INT_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+					.gpr[22] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, RB = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+					.gpr[22] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RS = INT_MAX, RB = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = INT_MAX,
+					.gpr[22] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RS = UINT_MAX, RB = UINT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = UINT_MAX,
+					.gpr[22] = UINT_MAX,
+				}
+			},
+			{
+				/* Test for sh < 32 */
+				.descr = "RS = 0xffff, RB = 0x0",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0xfffff,
+					.gpr[22] = 0x0,
+				}
+			},
+
+			{
+				/* Test for sh < 32 */
+				.descr = "RS = 0xfff, RB = 0x20",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0xfff,
+					.gpr[22] = 0x20,
+				}
+			},
+			{
+				/* Check for (RS)32 sign propagate */
+				.descr = "RS = 100000011, RB = 0xff1",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0x100000011,
+					.gpr[22] = 0xff1,
+				}
+			},
+			{
+				/* Check for (RS)32 sign propagate */
+				.descr = "RS = 100000011, RB = 0x11",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0x100000011,
+					.gpr[22] = 0x11,
+				}
+			},
+			{
+				/* Verify (RS)58 MASK bits */
+				.descr = "RS = 0x11, RB = 0xff1",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0x11,
+					.gpr[22] = 0xff1,
+				}
+			},
+			{
+				/* Test for MASK flag */
+				.descr = "RS = 0xffff, RB = 0xff1",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0xffff,
+					.gpr[22] = 0xff1,
+				}
+			},
+			{
+				/* Test for CARRY (CA/CA32) flag */
+				.descr = "RS = 1FF000001, RB = FC00000000000000",
+				.instr = ppc_inst(PPC_RAW_SRAW_DOT(20, 21, 22)),
+				.regs = {
+					.gpr[21] = 0x1FF000001,
+					.gpr[22] = 0xFC00000000000000,
+				}
+			}
+		}
+	},
+	{
+		.mnemonic = "srawi",
+		.subtests = {
+			{
+				.descr = "RS = 0xff, SH = 0x0",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, 0x0)),
+				.regs = {
+					.gpr[21] = 0xff,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, SH = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, LONG_MIN)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, SH = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, LONG_MAX)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MAX, SH = LONG_MAX",
+				.flags = IGNORE_CCR,
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, LONG_MAX)),
+				.regs = {
+					.gpr[21] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = 0x1ffffffff, SH = 0x0",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, 0x0)),
+				.regs = {
+					.gpr[21] = 0x1ffffffff,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, SH = 0x1",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, 0x1)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, SH = INT_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, INT_MIN)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, SH = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, INT_MAX)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = INT_MAX, SH = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, INT_MAX)),
+				.regs = {
+					.gpr[21] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RS = UINT_MAX, SH = UINT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, UINT_MAX)),
+				.regs = {
+					.gpr[21] = UINT_MAX,
+				}
+			},
+			{
+				/* Test for sh < 32 */
+				.descr = "RS = 0xffff, SH = 0x0",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, 0x0)),
+				.regs = {
+					.gpr[21] = 0xfffff,
+				}
+			},
+
+			{
+				/* Test for sh < 32 */
+				.descr = "RS = 0xfff, SH = 0x20",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, 0x20)),
+				.regs = {
+					.gpr[21] = 0xfff,
+				}
+			},
+			{
+				/* Check for (RS)32 sign propagate */
+				.descr = "RS = 1000fffff, SH = 0xff1",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, 0xff1)),
+				.regs = {
+					.gpr[21] = 0x1000fffff,
+				}
+			},
+			{
+				/* Check for (RS)32 sign propagate */
+				.descr = "RS = 1000fffff, SH = 0x11",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, 0x11)),
+				.regs = {
+					.gpr[21] = 0x1000fffff,
+				}
+			},
+			{
+				/* Test for MASK flag */
+				.descr = "RS = 0x1ffffffff, SH = 0x31",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, 0x31)),
+				.regs = {
+					.gpr[21] = 0x1ffffffff,
+				}
+			},
+			{
+				/* Test for CARRY (CA/CA32) flag */
+				.descr = "RS = 0x1ffffffff, SH = 0xf",
+				.instr = ppc_inst(PPC_RAW_SRAWI(20, 21, 0xf)),
+				.regs = {
+					.gpr[21] = 0x1ffffffff,
+				}
+			}
+		}
+	},
+	{
+		.mnemonic = "srawi.",
+		.subtests = {
+			{
+				.descr = "RS = 0xff, SH = 0x0",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, 0x0)),
+				.regs = {
+					.gpr[21] = 0xff,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, SH = LONG_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, LONG_MIN)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MIN, SH = LONG_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, LONG_MAX)),
+				.regs = {
+					.gpr[21] = LONG_MIN,
+				}
+			},
+			{
+				.descr = "RS = LONG_MAX, SH = LONG_MAX",
+				.flags = IGNORE_CCR,
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, LONG_MAX)),
+				.regs = {
+					.gpr[21] = LONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = 0x1ffffffff, SH = 0x0",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, 0x0)),
+				.regs = {
+					.gpr[21] = 0x1ffffffff,
+				}
+			},
+			{
+				.descr = "RS = ULONG_MAX, SH = 0x1",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, 0x1)),
+				.regs = {
+					.gpr[21] = ULONG_MAX,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, SH = INT_MIN",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, INT_MIN)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = INT_MIN, SH = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, INT_MAX)),
+				.regs = {
+					.gpr[21] = INT_MIN,
+				}
+			},
+			{
+				.descr = "RS = INT_MAX, SH = INT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, INT_MAX)),
+				.regs = {
+					.gpr[21] = INT_MAX,
+				}
+			},
+			{
+				.descr = "RS = UINT_MAX, SH = UINT_MAX",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, UINT_MAX)),
+				.regs = {
+					.gpr[21] = UINT_MAX,
+				}
+			},
+			{
+				/* Test for sh < 32 */
+				.descr = "RS = 0xffff, SH = 0x0",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, 0x0)),
+				.regs = {
+					.gpr[21] = 0xfffff,
+				}
+			},
+
+			{
+				/* Test for sh < 32 */
+				.descr = "RS = 0xfff, SH = 0x20",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, 0x20)),
+				.regs = {
+					.gpr[21] = 0xfff,
+				}
+			},
+			{
+				/* Check for (RS)32 sign propagate */
+				.descr = "RS = 1000fffff, SH = 0xff1",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, 0xff1)),
+				.regs = {
+					.gpr[21] = 0x1000fffff,
+				}
+			},
+			{
+				/* Check for (RS)32 sign propagate */
+				.descr = "RS = 1000fffff, SH = 0x11",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, 0x11)),
+				.regs = {
+					.gpr[21] = 0x1000fffff,
+				}
+			},
+			{
+				/* Test for MASK flag */
+				.descr = "RS = 0x1ffffffff, SH = 0x31",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, 0x31)),
+				.regs = {
+					.gpr[21] = 0x1ffffffff,
+				}
+			},
+			{
+				/* Test for CARRY (CA/CA32) flag */
+				.descr = "RS = 0x1ffffffff, SH = 0xf",
+				.instr = ppc_inst(PPC_RAW_SRAWI_DOT(20, 21, 0xf)),
+				.regs = {
+					.gpr[21] = 0x1ffffffff,
+				}
+			}
+		}
+	},
+	{
 		.mnemonic = "divde",
 		.subtests = {
 			{
