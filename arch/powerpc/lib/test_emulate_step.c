@@ -13,6 +13,7 @@
 #include <asm/ppc-opcode.h>
 #include <asm/code-patching.h>
 #include <asm/inst.h>
+#include <asm/switch_to.h>
 
 #define MAX_SUBTESTS	16
 
@@ -547,6 +548,30 @@ static void __init test_lvx_stvx(void)
 #endif /* CONFIG_ALTIVEC */
 
 #ifdef CONFIG_VSX
+static inline bool __init lxvd2x_dword_store(u32 word[], u32 data[])
+{
+	return (word[0] == data[0] && word[1] == data[1] &&
+		word[2] == data[2] && word[3] == data[3]);
+}
+
+static inline bool __init lxvd2x_dword_load(u32 word[], u32 data[])
+{
+#ifdef __LITTLE_ENDIAN__
+	/*
+	 * c.b[1]| c.b[0]| c.b[3]| c.b[2]
+	 * word0 | word1 | word2 | word3
+	 */
+	return (word[0] == data[1] && word[1] == data[0] &&
+		word[2] == data[3] && word[3] == data[2]);
+#else
+	/*
+	 * c.b[0]| c.b[1]| c.b[2]| c.b[3]
+	 * word0 | word1 | word2 | word3
+	 */
+	return (lxvd2x_dword_store(word, data));
+#endif
+}
+
 static void __init test_lxvd2x_stxvd2x(void)
 {
 	struct pt_regs regs;
@@ -554,26 +579,65 @@ static void __init test_lxvd2x_stxvd2x(void)
 		vector128 a;
 		u32 b[4];
 	} c;
-	u32 cached_b[4];
-	int stepped = -1;
+	u32 cached_b[4], word[4];
+	int stepped = -1, reg;
+	bool dword_check = false;
 
 	init_pt_regs(&regs);
 
-
 	/*** lxvd2x ***/
 
-	cached_b[0] = c.b[0] = 18233;
-	cached_b[1] = c.b[1] = 34863571;
-	cached_b[2] = c.b[2] = 834;
-	cached_b[3] = c.b[3] = 6138911;
+	cached_b[0] = c.b[0] = 0x01020304;
+	cached_b[1] = c.b[1] = 0x05060708;
+	cached_b[2] = c.b[2] = 0x090a0b0c;
+	cached_b[3] = c.b[3] = 0x0d0e0f10;
 
 	regs.gpr[3] = (unsigned long) &c.a;
 	regs.gpr[4] = 0;
 
-	/* lxvd2x vsr39, r3, r4 */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_LXVD2X(39, R3, R4)));
+	/* Test whether we handle dword saved in to fp_state.fpr */
+	reg = 0;
+	regs.msr &= ~MSR_FP;
+	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_LXVD2X(reg, R3, R4)));
+	regs.msr |= MSR_FP;
+	/*
+	 * In emulate_vsx_load() for lxvd2x c.b[0] and c.b[1] are written to
+	 * vsx_reg dword[1] c.b[2] and c.b[3] are writted to vsx_reg dword[0]
+	 * in memory {c.b[2], c.b[3], c.b[0] and c.b[1]}, lxvd2x loads it
+	 * {c.b[3], c.b[2], c.b[1], c.b[0]} and if LE xxswapd makes it
+	 * {c.b[1], c.b[0], c.b[3], c.b[2]}. Check fpr[reg] as how it is
+	 * stored with flush_vsx_to_thread()
+	 */
+	memcpy(word, &current->thread.fp_state.fpr[reg][0], 16);
+	dword_check = lxvd2x_dword_load(word, cached_b);
 
-	if (stepped == 1 && cpu_has_feature(CPU_FTR_VSX)) {
+	/* Test whether we handle dword saved in to vr_state.vr */
+	reg = 32;
+	regs.msr &= ~MSR_VEC;
+	stepped &= emulate_step(&regs, ppc_inst(PPC_RAW_LXVD2X(reg, R3, R4)));
+	regs.msr |= MSR_VEC;
+	memcpy(word, &current->thread.vr_state.vr[reg - 32], 16);
+	dword_check &= lxvd2x_dword_load(word, cached_b);
+
+	/* Test whether load_vsrn loads & flushing it to fp_state.fpr is appropriate */
+	reg = 0;
+	stepped &= emulate_step(&regs, ppc_inst(PPC_RAW_LXVD2X(reg, R3, R4)));
+	flush_vsx_to_thread(current);
+	memcpy(word, &current->thread.fp_state.fpr[reg][0], 16);
+	regs.msr |= (MSR_FP | MSR_VEC | MSR_VSX);
+	dword_check &= lxvd2x_dword_load(word, cached_b);
+
+	/* Test whether load_vsrn loads & flushing it to vr_state.vr is appropriate */
+	reg = 32;
+	stepped &= emulate_step(&regs, ppc_inst(PPC_RAW_LXVD2X(reg, R3, R4)));
+	flush_vsx_to_thread(current);
+	memcpy(word, &current->thread.vr_state.vr[reg - 32], 16);
+	regs.msr |= (MSR_FP | MSR_VEC | MSR_VSX);
+	dword_check &= lxvd2x_dword_load(word, cached_b);
+
+	/* lxvd2x vsr39, r3, r4 */
+	stepped &= emulate_step(&regs, ppc_inst(PPC_RAW_LXVD2X(39, R3, R4)));
+	if (stepped == 1 && cpu_has_feature(CPU_FTR_VSX) && dword_check) {
 		show_result("lxvd2x", "PASS");
 	} else {
 		if (!cpu_has_feature(CPU_FTR_VSX))
@@ -581,7 +645,6 @@ static void __init test_lxvd2x_stxvd2x(void)
 		else
 			show_result("lxvd2x", "FAIL");
 	}
-
 
 	/*** stxvd2x ***/
 
@@ -592,10 +655,41 @@ static void __init test_lxvd2x_stxvd2x(void)
 
 	/* stxvd2x vsr39, r3, r4 */
 	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_STXVD2X(39, R3, R4)));
+	dword_check = lxvd2x_dword_store(c.b, cached_b);
 
-	if (stepped == 1 && cached_b[0] == c.b[0] && cached_b[1] == c.b[1] &&
-	    cached_b[2] == c.b[2] && cached_b[3] == c.b[3] &&
-	    cpu_has_feature(CPU_FTR_VSX)) {
+	/* Test whether we handle dword saved in to fp_state.fpr */
+	reg = 0;
+	regs.msr &= ~MSR_FP;
+	stepped &= emulate_step(&regs, ppc_inst(PPC_RAW_LXVD2X(reg, R3, R4)));
+	stepped &= emulate_step(&regs, ppc_inst(PPC_RAW_STXVD2X(reg, R3, R4)));
+	regs.msr |= MSR_FP;
+	dword_check &= lxvd2x_dword_store(c.b, cached_b);
+
+	/* Test whether we handle dword saved in to vr_state.vr */
+	reg = 32;
+	regs.msr &= ~MSR_VEC;
+	stepped &= emulate_step(&regs, ppc_inst(PPC_RAW_LXVD2X(reg, R3, R4)));
+	stepped &= emulate_step(&regs, ppc_inst(PPC_RAW_STXVD2X(reg, R3, R4)));
+	regs.msr |= MSR_VEC;
+	dword_check &= lxvd2x_dword_store(c.b, cached_b);
+
+	/* Test whether load_vsrn loads & flushing it to fp_state.fpr is appropriate */
+	reg = 0;
+	stepped &= emulate_step(&regs, ppc_inst(PPC_RAW_LXVD2X(reg, R3, R4)));
+	flush_vsx_to_thread(current);
+	stepped &= emulate_step(&regs, ppc_inst(PPC_RAW_STXVD2X(reg, R3, R4)));
+	regs.msr |= (MSR_FP | MSR_VEC | MSR_VSX);
+	dword_check &= lxvd2x_dword_store(c.b, cached_b);
+
+	/* Test whether load_vsrn loads & flushing it to vr_state.vr is appropriate */
+	reg = 32;
+	stepped &= emulate_step(&regs, ppc_inst(PPC_RAW_LXVD2X(reg, R3, R4)));
+	flush_vsx_to_thread(current);
+	stepped &= emulate_step(&regs, ppc_inst(PPC_RAW_STXVD2X(reg, R3, R4)));
+	regs.msr |= (MSR_FP | MSR_VEC | MSR_VSX);
+	dword_check &= lxvd2x_dword_store(c.b, cached_b);
+
+	if (stepped == 1 && cpu_has_feature(CPU_FTR_VSX) && dword_check) {
 		show_result("stxvd2x", "PASS");
 	} else {
 		if (!cpu_has_feature(CPU_FTR_VSX))
