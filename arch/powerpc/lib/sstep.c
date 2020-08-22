@@ -8,6 +8,7 @@
 #include <linux/kprobes.h>
 #include <linux/ptrace.h>
 #include <linux/prefetch.h>
+#include <linux/slab.h>
 #include <asm/sstep.h>
 #include <asm/processor.h>
 #include <linux/uaccess.h>
@@ -64,6 +65,9 @@ extern int do_stqcx(unsigned long ea, unsigned long val0, unsigned long val1,
 #define IS_LE	0
 #define IS_BE	1
 #endif
+
+#define WORD	4
+#define DWORD	8
 
 /*
  * Emulate the truncation of 64 bit values in 32-bit mode.
@@ -853,6 +857,26 @@ void emulate_vsx_store(struct instruction_op *op, const union vsx_reg *reg,
 EXPORT_SYMBOL_GPL(emulate_vsx_store);
 NOKPROBE_SYMBOL(emulate_vsx_store);
 
+static nokprobe_inline void swap_mem(void *mem, int size)
+{
+	void *word = kmalloc(size, GFP_KERNEL);
+
+	memcpy(word, mem, size);
+	memcpy(mem, (u8 *)mem + size, size);
+	memcpy((u8 *)mem + size, word, size);
+	kfree(word);
+}
+
+static inline nokprobe_inline void lxvd2x_swap(struct instruction_op *op,
+					       int size, union vsx_reg *reg)
+{
+	if (IS_LE && size == 16 && op->element_size == 8) {
+		swap_mem(&reg->v, DWORD);
+		swap_mem(&reg->d[0], WORD);
+		swap_mem(&reg->d[1], WORD);
+	}
+}
+
 static nokprobe_inline int do_vsx_load(struct instruction_op *op,
 				       unsigned long ea, struct pt_regs *regs,
 				       bool cross_endian)
@@ -872,14 +896,19 @@ static nokprobe_inline int do_vsx_load(struct instruction_op *op,
 		if (regs->msr & MSR_FP) {
 			load_vsrn(reg, &buf);
 		} else {
+			/* lxvd2x */
+			lxvd2x_swap(op, size, &buf);
 			current->thread.fp_state.fpr[reg][0] = buf.d[0];
 			current->thread.fp_state.fpr[reg][1] = buf.d[1];
 		}
 	} else {
-		if (regs->msr & MSR_VEC)
+		if (regs->msr & MSR_VEC) {
 			load_vsrn(reg, &buf);
-		else
+		} else {
+			/* lxvd2x */
+			lxvd2x_swap(op, size, &buf);
 			current->thread.vr_state.vr[reg - 32] = buf.v;
+		}
 	}
 	preempt_enable();
 	return 0;
@@ -905,12 +934,15 @@ static nokprobe_inline int do_vsx_store(struct instruction_op *op,
 		} else {
 			buf.d[0] = current->thread.fp_state.fpr[reg][0];
 			buf.d[1] = current->thread.fp_state.fpr[reg][1];
+			lxvd2x_swap(op, size, &buf);
 		}
 	} else {
-		if (regs->msr & MSR_VEC)
+		if (regs->msr & MSR_VEC) {
 			store_vsrn(reg, &buf);
-		else
+		} else {
 			buf.v = current->thread.vr_state.vr[reg - 32];
+			lxvd2x_swap(op, size, &buf);
+		}
 	}
 	preempt_enable();
 	emulate_vsx_store(op, &buf, mem, cross_endian);
